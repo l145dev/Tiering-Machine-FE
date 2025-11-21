@@ -1,4 +1,5 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
+import Ads from "../Ads";
 
 const Left = () => {
   return (
@@ -10,10 +11,7 @@ const Left = () => {
         p: 2,
       }}
     >
-      <Typography variant="h6">Ads/Events</Typography>
-      <Typography variant="body2" color="text.secondary">
-        Ads/Events go here.
-      </Typography>
+      <Ads />
     </Box>
   );
 };
