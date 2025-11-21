@@ -68,8 +68,28 @@ const theme = createTheme({
     },
     MuiCssBaseline: {
       styleOverrides: {
+        html: {
+          scrollbarWidth: "none", // Firefox
+          msOverflowStyle: "none", // IE 10+
+          "&::-webkit-scrollbar": {
+            display: "none", // Chrome, Safari, Opera
+          },
+        },
         body: {
           backgroundColor: "#FFFFFF",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        },
+        // Hide scrollbars for all elements (like the leaderboard list)
+        "*": {
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
         },
       },
     },
