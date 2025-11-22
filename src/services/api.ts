@@ -53,6 +53,13 @@ export interface ReportRequest {
   reason: string;
 }
 
+export interface ReportResponse {
+  target: string;
+  reporter: string;
+  target_points_lost: number;
+  report_points_earned: number;
+}
+
 export const fetchEvents = async (): Promise<ApiEvent[]> => {
   const response = await fetch(`${BASE_URL}/events`);
   if (!response.ok) {
@@ -96,7 +103,7 @@ export const loginUser = async (
 export const reportCitizen = async (
   reporterId: number,
   data: ReportRequest
-): Promise<void> => {
+): Promise<ReportResponse> => {
   const response = await fetch(`${BASE_URL}/report`, {
     method: "POST",
     headers: {
@@ -108,4 +115,5 @@ export const reportCitizen = async (
   if (!response.ok) {
     throw new Error("Report failed");
   }
+  return response.json();
 };

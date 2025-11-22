@@ -1,7 +1,9 @@
+import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   Avatar,
   Box,
   CircularProgress,
+  IconButton,
   List,
   ListItem,
   ListItemAvatar,
@@ -9,7 +11,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
 import { type ApiLeaderboardEntry, fetchLeaderboard } from "../services/api";
 
@@ -21,25 +23,25 @@ const Leaderboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadLeaderboard = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchLeaderboard();
-        setLeaderboardData(data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to load leaderboard:", err);
-        setError("Failed to load leaderboard data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadLeaderboard();
+  const loadLeaderboard = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await fetchLeaderboard();
+      setLeaderboardData(data);
+      setError(null);
+    } catch (err) {
+      console.error("Failed to load leaderboard:", err);
+      setError("Failed to load leaderboard data.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  if (loading) {
+  useEffect(() => {
+    loadLeaderboard();
+  }, [loadLeaderboard]);
+
+  if (loading && leaderboardData.length === 0) {
     return (
       <Box
         sx={{
@@ -54,16 +56,37 @@ const Leaderboard = () => {
     );
   }
 
-  if (error) {
+  if (error && leaderboardData.length === 0) {
     return (
       <Box sx={{ p: 2, color: "error.main", textAlign: "center" }}>
         <Typography variant="body2">{error}</Typography>
+        <IconButton onClick={loadLeaderboard} color="primary">
+          <RefreshIcon />
+        </IconButton>
       </Box>
     );
   }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      {/* Header */}
+      <Box
+        sx={{
+          p: 1,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          flexShrink: 0,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="subtitle2">Leaderboard</Typography>
+        <IconButton onClick={loadLeaderboard} size="small">
+          <RefreshIcon fontSize="small" />
+        </IconButton>
+      </Box>
+
       {/* Scrollable List */}
       <Box sx={{ flexGrow: 1, overflowY: "auto", position: "relative" }}>
         <List disablePadding>

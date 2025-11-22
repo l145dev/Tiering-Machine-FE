@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import Leaderboard from "../Leaderboard";
 import MacrodataRefinement from "../MacrodataRefinement";
 import Marquee from "../Marquee";
@@ -43,16 +43,6 @@ const Middle = () => {
           overflow: "hidden",
         }}
       >
-        <Box
-          sx={{
-            p: 1,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            flexShrink: 0,
-          }}
-        >
-          <Typography variant="subtitle2">Leaderboard</Typography>
-        </Box>
         <Box sx={{ flex: 1, overflow: "hidden" }}>
           <Leaderboard />
         </Box>

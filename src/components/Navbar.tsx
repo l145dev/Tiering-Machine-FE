@@ -55,7 +55,7 @@ const Navbar = () => {
       setSuccess(true);
       setTimeout(() => {
         handleReportClose();
-      }, 1500);
+      }, 3000);
     } catch (err) {
       console.error("Report failed:", err);
       setError("Failed to submit report. The system may be down.");
@@ -147,16 +147,31 @@ const Navbar = () => {
 
       {/* Report Dialog */}
       <Dialog open={reportOpen} onClose={handleReportClose}>
-        <DialogTitle sx={{ color: "error.main", fontWeight: "bold" }}>REPORT SUSPICIOUS ACTIVITY</DialogTitle>
+        <DialogTitle sx={{ color: "error.main", fontWeight: "bold" }}>
+          REPORT SUSPICIOUS ACTIVITY
+        </DialogTitle>
         <DialogContent>
           <DialogContentText sx={{ mb: 2 }}>
-            Identify the citizen and describe their infraction. False reports will be punished.
+            Identify the citizen and describe their infraction. False reports
+            will be punished.
           </DialogContentText>
 
           {success ? (
-            <Box sx={{ p: 2, bgcolor: "success.light", color: "success.contrastText", borderRadius: 1, textAlign: "center" }}>
-              <Typography fontWeight="bold">Report Submitted Successfully.</Typography>
-              <Typography variant="caption">Your vigilance is noted.</Typography>
+            <Box
+              sx={{
+                p: 2,
+                bgcolor: "success.light",
+                color: "success.contrastText",
+                borderRadius: 1,
+                textAlign: "center",
+              }}
+            >
+              <Typography fontWeight="bold">
+                Report Submitted Successfully.
+              </Typography>
+              <Typography variant="caption">
+                Your vigilance is noted.
+              </Typography>
             </Box>
           ) : (
             <>
@@ -183,7 +198,11 @@ const Navbar = () => {
                 onChange={(e) => setReason(e.target.value)}
               />
               {error && (
-                <Typography color="error" variant="caption" sx={{ mt: 1, display: "block" }}>
+                <Typography
+                  color="error"
+                  variant="caption"
+                  sx={{ mt: 1, display: "block" }}
+                >
                   {error}
                 </Typography>
               )}
@@ -194,7 +213,12 @@ const Navbar = () => {
           {!success && (
             <>
               <Button onClick={handleReportClose}>Cancel</Button>
-              <Button onClick={handleSubmitReport} color="error" variant="contained" disabled={loading}>
+              <Button
+                onClick={handleSubmitReport}
+                color="error"
+                variant="contained"
+                disabled={loading}
+              >
                 {loading ? "Submitting..." : "Submit Report"}
               </Button>
             </>
