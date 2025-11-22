@@ -19,8 +19,6 @@ interface UserContextType {
   logout: () => void;
 }
 
-
-
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -67,7 +65,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
         rank: data.rank,
         username: data.username,
         tier: data.tier.toLowerCase() as Tier,
-        total_points: data.totalPoints,
+        total_points: data.total_points,
       };
 
       setUser(userProfile);

@@ -1,107 +1,111 @@
-
-const BASE_URL = "http://localhost:8080/api";
+const BASE_URL = "http://10.30.64.227:8080/api";
 
 export interface ApiEvent {
+  id: number;
+  title: string;
+  description: string;
+  eventDate: string;
+  reward: number;
+  creator: {
     id: number;
-    title: string;
-    description: string;
-    eventDate: string;
-    reward: number;
-    creator: {
-        id: number;
-        username: string;
-        tier: {
-            id: number;
-            name: string;
-        };
+    username: string;
+    tier: {
+      id: number;
+      name: string;
     };
+  };
 }
 
 export interface ApiBet {
-    id: number;
-    description: string;
-    creator: string | { username: string };
-    target: string;
-    wagerPoints: number;
-    payoutPoints: number;
-    lossPoints: number;
-    actualOutcome: boolean | null;
-    resolutionDate: string;
+  id: number;
+  description: string;
+  creator: string | { username: string };
+  target: string;
+  wagerPoints: number;
+  payoutPoints: number;
+  lossPoints: number;
+  actualOutcome: boolean | null;
+  resolutionDate: string;
 }
 
 export interface ApiLeaderboardEntry {
-    rank: number;
-    name: string;
-    points: number;
-    tier: string;
+  rank: number;
+  name: string;
+  points: number;
+  tier: string;
 }
 
 export interface LoginRequest {
-    citizenNumber: string;
-    password: string;
+  citizenNumber: string;
+  password: string;
 }
 
 export interface LoginResponse {
-    id: number;
-    rank: number;
-    username: string;
-    totalPoints: number;
-    tier: string;
+  id: number;
+  rank: number;
+  username: string;
+  total_points: number;
+  tier: string;
 }
 
 export interface ReportRequest {
-    targetId: number;
-    reason: string;
+  targetId: number;
+  reason: string;
 }
 
 export const fetchEvents = async (): Promise<ApiEvent[]> => {
-    const response = await fetch(`${BASE_URL}/events`);
-    if (!response.ok) {
-        throw new Error("Failed to fetch events");
-    }
-    return response.json();
+  const response = await fetch(`${BASE_URL}/events`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch events");
+  }
+  return response.json();
 };
 
 export const fetchBets = async (): Promise<ApiBet[]> => {
-    const response = await fetch(`${BASE_URL}/bets`);
-    if (!response.ok) {
-        throw new Error("Failed to fetch bets");
-    }
-    return response.json();
+  const response = await fetch(`${BASE_URL}/bets`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch bets");
+  }
+  return response.json();
 };
 
 export const fetchLeaderboard = async (): Promise<ApiLeaderboardEntry[]> => {
-    const response = await fetch(`${BASE_URL}/leaderboard`);
-    if (!response.ok) {
-        throw new Error("Failed to fetch leaderboard");
-    }
-    return response.json();
+  const response = await fetch(`${BASE_URL}/leaderboard`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch leaderboard");
+  }
+  return response.json();
 };
 
-export const loginUser = async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await fetch(`${BASE_URL}/login`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-    });
-    if (!response.ok) {
-        throw new Error("Login failed");
-    }
-    return response.json();
+export const loginUser = async (
+  credentials: LoginRequest
+): Promise<LoginResponse> => {
+  const response = await fetch(`${BASE_URL}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  });
+  if (!response.ok) {
+    throw new Error("Login failed");
+  }
+  return response.json();
 };
 
-export const reportCitizen = async (reporterId: number, data: ReportRequest): Promise<void> => {
-    const response = await fetch(`${BASE_URL}/report`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-Citizen-Id": reporterId.toString(),
-        },
-        body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-        throw new Error("Report failed");
-    }
+export const reportCitizen = async (
+  reporterId: number,
+  data: ReportRequest
+): Promise<void> => {
+  const response = await fetch(`${BASE_URL}/report`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Citizen-Id": reporterId.toString(),
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) {
+    throw new Error("Report failed");
+  }
 };
