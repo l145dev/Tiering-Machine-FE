@@ -86,7 +86,7 @@ const Betting = () => {
             {/* Left Side - Info */}
             <Box
               sx={{
-                width: "70%",
+                width: "65%",
                 p: 2,
                 display: "flex",
                 flexDirection: "column",
@@ -94,7 +94,18 @@ const Betting = () => {
                 position: "relative",
               }}
             >
-              <Typography variant="body2" fontWeight="500" sx={{ mb: 2 }}>
+              <Typography
+                variant="body2"
+                fontWeight="500"
+                sx={{
+                  mb: 2,
+                  display: "-webkit-box",
+                  WebkitLineClamp: 3,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
                 {bet.description}
               </Typography>
               <Box
@@ -116,39 +127,86 @@ const Betting = () => {
             {/* Right Side - Options */}
             <Box
               sx={{
-                width: "30%",
+                width: "35%",
                 display: "flex",
                 flexDirection: "column",
                 borderLeft: "1px solid",
                 borderColor: "divider",
+                bgcolor: "rgba(0, 0, 0, 0.2)",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                "&:hover": {
+                  bgcolor: "rgba(255, 255, 255, 0.05)",
+                },
               }}
             >
-              {/* Bet Action */}
               <Box
                 sx={{
                   flex: 1,
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
                   p: 1,
-                  bgcolor: "rgba(27, 94, 32, 0.3)", // Dark Green background
-                  color: "#69F0AE", // Neon Green Text
-                  cursor: "pointer",
-                  transition: "background-color 0.2s",
-                  "&:hover": {
-                    bgcolor: "rgba(27, 94, 32, 0.5)", // Darker Green Hover
-                  },
                 }}
               >
-                <Typography variant="caption" align="center" lineHeight={1.2}>
-                  <span style={{ color: "#ff8a80", fontSize: "0.9em" }}>
-                    WAGER {bet.wagerPoints}
-                  </span>
-                  <br />
-                  <strong style={{ fontSize: "1.1em" }}>
-                    WIN {bet.payoutPoints}
-                  </strong>
-                </Typography>
+                <Box sx={{ textAlign: "center", mb: 1 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "error.main",
+                      fontWeight: "bold",
+                      letterSpacing: "1px",
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    WAGER
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "error.light",
+                      fontWeight: "bold",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {bet.wagerPoints}
+                  </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    width: "40%",
+                    height: "1px",
+                    bgcolor: "divider",
+                    my: 0.5,
+                  }}
+                />
+
+                <Box sx={{ textAlign: "center", mt: 1 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "success.main",
+                      fontWeight: "bold",
+                      letterSpacing: "1px",
+                      fontSize: "0.7rem",
+                    }}
+                  >
+                    PAYOUT
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: "success.light",
+                      fontWeight: "bold",
+                      lineHeight: 1,
+                      textShadow: "0 0 10px rgba(105, 240, 174, 0.3)",
+                    }}
+                  >
+                    {bet.payoutPoints}
+                  </Typography>
+                </Box>
               </Box>
             </Box>
           </Paper>

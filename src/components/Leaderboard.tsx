@@ -1,6 +1,7 @@
 import {
   Avatar,
   Box,
+  CircularProgress,
   List,
   ListItem,
   ListItemAvatar,
@@ -8,11 +9,58 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
+import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
-import { leaderboardData } from "../mock_data/leaderboardData";
+import { type ApiLeaderboardEntry, fetchLeaderboard } from "../services/api";
 
 const Leaderboard = () => {
   const { user } = useUser();
+  const [leaderboardData, setLeaderboardData] = useState<ApiLeaderboardEntry[]>(
+    []
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadLeaderboard = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchLeaderboard();
+        setLeaderboardData(data);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to load leaderboard:", err);
+        setError("Failed to load leaderboard data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadLeaderboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 2, color: "error.main", textAlign: "center" }}>
+        <Typography variant="body2">{error}</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -43,7 +91,10 @@ const Leaderboard = () => {
                 {item.rank}
               </Typography>
               <ListItemAvatar>
-                <Avatar alt={item.name} src={item.avatar} />
+                <Avatar
+                  alt={item.name}
+                  src={`https://i.pravatar.cc/150?u=${item.id}`}
+                />
               </ListItemAvatar>
               <ListItemText
                 primary={item.name}
@@ -56,7 +107,7 @@ const Leaderboard = () => {
           ))}
         </List>
 
-        {/* Dreg Overlay - Blur top 10 */}
+        {/* Dreg Overlay - Blur top 3 */}
         {user?.tier === "dreg" && (
           <Box
             sx={{
@@ -64,7 +115,7 @@ const Leaderboard = () => {
               top: 0,
               left: 0,
               right: 0,
-              height: "560px", // This height acts as the "track" for the sticky element
+              height: "168px", // This height acts as the "track" for the sticky element
               backdropFilter: "blur(8px)",
               bgcolor: "rgba(0, 0, 0, 0.7)",
               zIndex: 10,

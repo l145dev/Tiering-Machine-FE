@@ -29,10 +29,10 @@ export interface ApiBet {
 }
 
 export interface ApiLeaderboardEntry {
+  id: number;
   rank: number;
   name: string;
   points: number;
-  tier: string;
 }
 
 export interface LoginRequest {
