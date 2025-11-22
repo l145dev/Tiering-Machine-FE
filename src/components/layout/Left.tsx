@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { useUser } from "../../context/UserContext";
-import Ads from "../Ads";
+
 import Events from "../Events";
 
 const Left = () => {
@@ -16,7 +16,7 @@ const Left = () => {
         overflow: "hidden",
       }}
     >
-      {user?.tier === "elite" ? <Events /> : <Ads />}
+      {user?.tier === "elite" ? <Events /> : <Events />}
     </Box>
   );
 };

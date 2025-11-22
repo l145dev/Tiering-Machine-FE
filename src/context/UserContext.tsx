@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { loginUser } from "../services/api";
 
 export type Tier = "elite" | "citizen" | "dreg";
 
@@ -18,14 +19,7 @@ interface UserContextType {
   logout: () => void;
 }
 
-// Default placeholder user
-const defaultUser: UserProfile = {
-  id: 42,
-  rank: 15,
-  username: "User 42",
-  tier: "dreg",
-  total_points: 1250,
-};
+
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
@@ -62,29 +56,27 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const login = async (
-    identity: string,
+    citizenNumber: string,
     password: string
   ): Promise<boolean> => {
-    // Mock login - in production this would call an API
-    // For now, accept any identity/password and return default user
-    await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API delay
+    try {
+      const data = await loginUser({ citizenNumber, password });
 
-    // Mock: Use identity to determine tier (for testing)
-    let mockUser = { ...defaultUser };
-    if (identity.toLowerCase().includes("elite")) {
-      mockUser.tier = "elite";
-      mockUser.username = identity;
-    } else if (identity.toLowerCase().includes("citizen")) {
-      mockUser.tier = "citizen";
-      mockUser.username = identity;
-    } else {
-      mockUser.tier = "dreg";
-      mockUser.username = identity;
+      const userProfile: UserProfile = {
+        id: data.id,
+        rank: data.rank,
+        username: data.username,
+        tier: data.tier.toLowerCase() as Tier,
+        total_points: data.totalPoints,
+      };
+
+      setUser(userProfile);
+      setIsAuthenticated(true);
+      return true;
+    } catch (error) {
+      console.error("Login failed:", error);
+      return false;
     }
-
-    setUser(mockUser);
-    setIsAuthenticated(true);
-    return true;
   };
 
   const logout = () => {

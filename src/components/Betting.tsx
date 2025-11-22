@@ -1,7 +1,54 @@
-import { Box, Paper, Typography } from "@mui/material";
-import { bettingData } from "../mock_data/bettingData";
+import { Box, CircularProgress, Paper, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useUser } from "../context/UserContext";
+import { type ApiBet, fetchBets } from "../services/api";
 
 const Betting = () => {
+  const { user } = useUser();
+  const [bets, setBets] = useState<ApiBet[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadBets = async () => {
+      if (!user) return;
+      try {
+        setLoading(true);
+        const data = await fetchBets();
+        setBets(data);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to load bets:", err);
+        setError("Failed to load bets. The odds are not in your favor.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBets();
+  }, []);
+
+  const getCreatorName = (creator: any) => {
+    if (typeof creator === 'string') return creator;
+    return creator?.username || 'Unknown';
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 2, color: "error.main", textAlign: "center" }}>
+        <Typography variant="body2">{error}</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
@@ -17,7 +64,7 @@ const Betting = () => {
           pr: 1, // Add padding for scrollbar space
         }}
       >
-        {bettingData.map((bet) => (
+        {bets.map((bet) => (
           <Paper
             key={bet.id}
             variant="outlined"
@@ -40,8 +87,8 @@ const Betting = () => {
                 position: "relative",
               }}
             >
-              <Typography variant="body1" fontWeight="500" sx={{ mb: 2 }}>
-                {bet.target} {bet.description}
+              <Typography variant="body2" fontWeight="500" sx={{ mb: 2 }}>
+                {bet.description}
               </Typography>
               <Box
                 sx={{
@@ -51,10 +98,10 @@ const Betting = () => {
                 }}
               >
                 <Typography variant="caption" color="text.secondary">
-                  Created by {bet.creator}
+                  Created by {getCreatorName(bet.creator)}
                 </Typography>
                 <Typography variant="caption" fontWeight="bold">
-                  {bet.duration}
+                  {new Date(bet.resolutionDate).toLocaleDateString()}
                 </Typography>
               </Box>
             </Box>
@@ -69,15 +116,13 @@ const Betting = () => {
                 borderColor: "divider",
               }}
             >
-              {/* Option A - Risky (Neon Green) */}
+              {/* Bet Action */}
               <Box
                 sx={{
                   flex: 1,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  borderBottom: "1px solid",
-                  borderColor: "divider",
                   p: 1,
                   bgcolor: "rgba(27, 94, 32, 0.3)", // Dark Green background
                   color: "#69F0AE", // Neon Green Text
@@ -90,48 +135,12 @@ const Betting = () => {
               >
                 <Typography variant="caption" align="center" lineHeight={1.2}>
                   <span style={{ color: "#ff8a80", fontSize: "0.9em" }}>
-                    BET {bet.wager}
+                    WAGER {bet.wagerPoints}
                   </span>
                   <br />
                   <strong style={{ fontSize: "1.1em" }}>
-                    WIN {bet.optionA.payout}
+                    WIN {bet.payoutPoints}
                   </strong>
-                  <br />
-                  <span style={{ opacity: 0.8 }}>
-                    ({bet.optionA.percentage}%)
-                  </span>
-                </Typography>
-              </Box>
-
-              {/* Option B - Safe (Sage Green) */}
-              <Box
-                sx={{
-                  flex: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  p: 1,
-                  bgcolor: "rgba(46, 59, 50, 0.3)", // Dark Sage background
-                  color: "#81C784", // Muted Green Text
-                  cursor: "pointer",
-                  transition: "background-color 0.2s",
-                  "&:hover": {
-                    bgcolor: "rgba(46, 59, 50, 0.5)", // Darker Sage Hover
-                  },
-                }}
-              >
-                <Typography variant="caption" align="center" lineHeight={1.2}>
-                  <span style={{ color: "#ff8a80", fontSize: "0.9em" }}>
-                    BET {bet.wager}
-                  </span>
-                  <br />
-                  <strong style={{ fontSize: "1.1em" }}>
-                    WIN {bet.optionB.payout}
-                  </strong>
-                  <br />
-                  <span style={{ opacity: 0.8 }}>
-                    ({bet.optionB.percentage}%)
-                  </span>
                 </Typography>
               </Box>
             </Box>
