@@ -69,7 +69,7 @@ const Betting = () => {
                 borderColor: "divider",
               }}
             >
-              {/* Option A - Positive (Green) */}
+              {/* Option A - Risky (Neon Green) */}
               <Box
                 sx={{
                   flex: 1,
@@ -79,22 +79,31 @@ const Betting = () => {
                   borderBottom: "1px solid",
                   borderColor: "divider",
                   p: 1,
-                  bgcolor: "#E8F5E9", // Light Green
-                  color: "#1B5E20", // Dark Green Text
+                  bgcolor: "rgba(27, 94, 32, 0.3)", // Dark Green background
+                  color: "#69F0AE", // Neon Green Text
                   cursor: "pointer",
                   transition: "background-color 0.2s",
                   "&:hover": {
-                    bgcolor: "#C8E6C9", // Darker Green Hover
+                    bgcolor: "rgba(27, 94, 32, 0.5)", // Darker Green Hover
                   },
                 }}
               >
                 <Typography variant="caption" align="center" lineHeight={1.2}>
-                  <strong>+{bet.optionA.points} pts</strong>
-                  <br />({bet.optionA.percentage}%)
+                  <span style={{ color: "#ff8a80", fontSize: "0.9em" }}>
+                    BET {bet.wager}
+                  </span>
+                  <br />
+                  <strong style={{ fontSize: "1.1em" }}>
+                    WIN {bet.optionA.payout}
+                  </strong>
+                  <br />
+                  <span style={{ opacity: 0.8 }}>
+                    ({bet.optionA.percentage}%)
+                  </span>
                 </Typography>
               </Box>
 
-              {/* Option B - Negative (Red) */}
+              {/* Option B - Safe (Sage Green) */}
               <Box
                 sx={{
                   flex: 1,
@@ -102,18 +111,27 @@ const Betting = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   p: 1,
-                  bgcolor: "#FFEBEE", // Light Red
-                  color: "#B71C1C", // Dark Red Text
+                  bgcolor: "rgba(46, 59, 50, 0.3)", // Dark Sage background
+                  color: "#81C784", // Muted Green Text
                   cursor: "pointer",
                   transition: "background-color 0.2s",
                   "&:hover": {
-                    bgcolor: "#FFCDD2", // Darker Red Hover
+                    bgcolor: "rgba(46, 59, 50, 0.5)", // Darker Sage Hover
                   },
                 }}
               >
                 <Typography variant="caption" align="center" lineHeight={1.2}>
-                  <strong>{bet.optionB.points} pts</strong>
-                  <br />({bet.optionB.percentage}%)
+                  <span style={{ color: "#ff8a80", fontSize: "0.9em" }}>
+                    BET {bet.wager}
+                  </span>
+                  <br />
+                  <strong style={{ fontSize: "1.1em" }}>
+                    WIN {bet.optionB.payout}
+                  </strong>
+                  <br />
+                  <span style={{ opacity: 0.8 }}>
+                    ({bet.optionB.percentage}%)
+                  </span>
                 </Typography>
               </Box>
             </Box>

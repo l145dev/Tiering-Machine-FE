@@ -1,13 +1,19 @@
+import { CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
-import theme from "./theme.tsx";
+import { UserProvider } from "./context/UserContext";
+import "./index.css";
+import theme from "./theme";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
-      <App />
+      <CssBaseline />
+      <UserProvider>
+        <App />
+      </UserProvider>
     </ThemeProvider>
   </StrictMode>
 );

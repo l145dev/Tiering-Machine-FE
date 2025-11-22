@@ -1,39 +1,24 @@
 import { Box, Paper } from "@mui/material";
-import datingAd from "../assets/dating_ad.png";
-import ramAd from "../assets/ram_ad.png";
-import voteAd from "../assets/vote_ad.png";
+import { useMemo } from "react";
+import ads from "../data/ads";
 
 const Ads = () => {
-  const ads = [
-    {
-      id: 1,
-      link: "https://www.google.com",
-      image: voteAd,
-    },
-    {
-      id: 2,
-      link: "https://www.google.com",
-      image: datingAd,
-    },
-    {
-      id: 3,
-      link: "https://www.google.com",
-      image: ramAd,
-    },
-  ];
+  const randomAds = useMemo(() => {
+    // Shuffle array and pick first 3
+    return [...ads].sort(() => 0.5 - Math.random()).slice(0, 3);
+  }, []);
 
   return (
     <Box
       sx={{ height: "100%", display: "flex", flexDirection: "column", gap: 2 }}
     >
-      {ads.map((ad) => (
+      {randomAds.map((ad, index) => (
         <Paper
-          key={ad.id}
+          key={index}
           elevation={1}
           component="a"
-          href={ad.link}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="#"
+          onClick={(e) => e.preventDefault()} // Prevent navigation for now
           sx={{
             flex: 1,
             display: "flex",
@@ -45,7 +30,7 @@ const Ads = () => {
         >
           <Box
             component="img"
-            src={ad.image}
+            src={new URL(`../assets/${ad}`, import.meta.url).href}
             alt="Advertisement"
             sx={{
               width: "100%",

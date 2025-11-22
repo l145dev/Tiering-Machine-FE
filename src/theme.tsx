@@ -2,55 +2,67 @@ import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
   palette: {
-    mode: "light",
+    mode: "dark",
     primary: {
-      main: "#262626", // Dark Gray / Black
+      main: "#D32F2F", // Propaganda Red
     },
     secondary: {
-      main: "#757575", // Lighter Gray
+      main: "#757575", // Industrial Gray
     },
     background: {
-      default: "#FFFFFF", // White background
-      paper: "#FFFFFF", // White paper
+      default: "#0a0a0a", // Very Dark Gray
+      paper: "#1a1a1a", // Dark Industrial Gray
     },
     text: {
-      primary: "#172B4D", // Jira dark blue-gray
-      secondary: "#6B778C",
+      primary: "#e0e0e0", // Off-white / Terminal text
+      secondary: "#b0b0b0",
     },
+    divider: "#333333",
   },
   shape: {
-    borderRadius: 10,
+    borderRadius: 0, // Square corners for industrial look
   },
   typography: {
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: "'Share Tech Mono', monospace",
+    h1: { textTransform: "uppercase", letterSpacing: "0.1em" },
+    h2: { textTransform: "uppercase", letterSpacing: "0.1em" },
+    h3: { textTransform: "uppercase", letterSpacing: "0.1em" },
+    h4: { textTransform: "uppercase", letterSpacing: "0.1em" },
+    h5: { textTransform: "uppercase", letterSpacing: "0.1em" },
+    h6: { textTransform: "uppercase", letterSpacing: "0.1em" },
     button: {
-      textTransform: "none",
-      fontWeight: 500,
+      textTransform: "uppercase",
+      fontWeight: 600,
+      letterSpacing: "0.05em",
     },
   },
   components: {
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: "#FFFFFF",
-          color: "#172B4D",
+          backgroundColor: "#0a0a0a",
+          color: "#D32F2F",
           boxShadow: "none",
-          borderBottom: "1px solid #E0E0E0",
+          borderBottom: "1px solid #D32F2F",
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
+          borderRadius: 0,
           boxShadow: "none",
+          border: "1px solid transparent",
           "&:hover": {
-            boxShadow: "none",
+            border: "1px solid #D32F2F",
+            backgroundColor: "rgba(211, 47, 47, 0.1)",
           },
         },
         containedPrimary: {
-          backgroundColor: "#262626",
+          backgroundColor: "#D32F2F",
+          color: "#000",
           "&:hover": {
-            backgroundColor: "#424242",
+            backgroundColor: "#B71C1C",
           },
         },
       },
@@ -58,32 +70,29 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
+          backgroundImage: "none",
           boxShadow: "none",
-          border: "1px solid #E0E0E0",
-        },
-        elevation1: {
-          boxShadow: "none",
+          border: "1px solid #333333",
         },
       },
     },
     MuiCssBaseline: {
       styleOverrides: {
         html: {
-          scrollbarWidth: "none", // Firefox
-          msOverflowStyle: "none", // IE 10+
-          "&::-webkit-scrollbar": {
-            display: "none", // Chrome, Safari, Opera
-          },
-        },
-        body: {
-          backgroundColor: "#FFFFFF",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
           "&::-webkit-scrollbar": {
             display: "none",
           },
         },
-        // Hide scrollbars for all elements (like the leaderboard list)
+        body: {
+          backgroundColor: "#0a0a0a",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        },
         "*": {
           scrollbarWidth: "none",
           msOverflowStyle: "none",

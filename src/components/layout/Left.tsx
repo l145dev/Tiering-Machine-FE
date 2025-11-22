@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
-// import Ads from "../Ads";
-import Events from "../Events";
+import Ads from "../Ads";
+// import Events from "../Events";
 
 const Left = () => {
   return (
@@ -13,8 +13,8 @@ const Left = () => {
         overflow: "hidden",
       }}
     >
-      {/* <Ads /> */}
-      <Events />
+      <Ads />
+      {/* <Events /> */}
     </Box>
   );
 };

@@ -8,17 +8,20 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { currentUser, leaderboardData } from "../mock_data/leaderboardData";
+import { useUser } from "../context/UserContext";
+import { leaderboardData } from "../mock_data/leaderboardData";
 
 const Leaderboard = () => {
+  const { user } = useUser();
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {/* Scrollable List */}
-      <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
+      <Box sx={{ flexGrow: 1, overflowY: "auto", position: "relative" }}>
         <List disablePadding>
-          {leaderboardData.map((user) => (
+          {leaderboardData.map((item) => (
             <ListItem
-              key={user.id}
+              key={item.id}
               sx={{
                 "&:nth-of-type(odd)": {
                   bgcolor: "action.hover", // Light gray
@@ -37,21 +40,57 @@ const Leaderboard = () => {
                   mr: 2,
                 }}
               >
-                {user.rank}
+                {item.rank}
               </Typography>
               <ListItemAvatar>
-                <Avatar alt={user.name} src={user.avatar} />
+                <Avatar alt={item.name} src={item.avatar} />
               </ListItemAvatar>
               <ListItemText
-                primary={user.name}
+                primary={item.name}
                 primaryTypographyProps={{ fontWeight: 500 }}
               />
               <Typography variant="body1" fontWeight="bold">
-                {user.points.toLocaleString()} pts
+                {item.points.toLocaleString()} pts
               </Typography>
             </ListItem>
           ))}
         </List>
+
+        {/* Dreg Overlay - Blur top 10 */}
+        {user.tier === "dreg" && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "560px", // Approximate height of 10 items
+              backdropFilter: "blur(8px)",
+              bgcolor: "rgba(0, 0, 0, 0.7)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10,
+              borderBottom: "2px solid",
+              borderColor: "primary.main",
+            }}
+          >
+            <Typography
+              variant="h5"
+              color="primary"
+              sx={{
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                textAlign: "center",
+                textShadow: "2px 2px 4px rgba(0,0,0,0.8)",
+                letterSpacing: "2px",
+                px: 4,
+              }}
+            >
+              Keep your eyes off of the elite, low life
+            </Typography>
+          </Box>
+        )}
       </Box>
 
       {/* Fixed User Row */}
@@ -76,17 +115,20 @@ const Leaderboard = () => {
               variant="body1"
               sx={{ width: 40, textAlign: "center", fontWeight: "bold", mr: 2 }}
             >
-              {currentUser.rank}
+              {user.rank}
             </Typography>
             <ListItemAvatar>
-              <Avatar alt={currentUser.name} src={currentUser.avatar} />
+              <Avatar
+                alt={user.username}
+                src={`https://i.pravatar.cc/150?u=${user.id}`}
+              />
             </ListItemAvatar>
             <ListItemText
-              primary={currentUser.name}
+              primary={"You"}
               slotProps={{ primary: { fontWeight: 900 } }}
             />
             <Typography variant="body1" fontWeight="bold">
-              {currentUser.points.toLocaleString()} pts
+              {user.total_points.toLocaleString()} pts
             </Typography>
           </ListItem>
         </List>

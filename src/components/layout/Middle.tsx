@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import Leaderboard from "../Leaderboard";
+import Marquee from "../Marquee";
 
 const Middle = () => {
   return (
@@ -10,12 +11,14 @@ const Middle = () => {
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
-        pt: 2,
+        borderRight: "1px solid",
+        borderColor: "divider",
       }}
     >
-      <Typography variant="h4" gutterBottom pl={2}>
-        Leaderboard
-      </Typography>
+      <Marquee />
+      <Box sx={{ pt: 2, pl: 2 }}>
+        <Typography variant="h4">Leaderboard</Typography>
+      </Box>
       <Box sx={{ flexGrow: 1, minHeight: 0 }}>
         <Leaderboard />
       </Box>

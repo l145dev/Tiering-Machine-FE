@@ -1,18 +1,21 @@
 import { Box, CssBaseline } from "@mui/material";
-import Navbar from "./components/Navbar";
 import Left from "./components/layout/Left";
 import Middle from "./components/layout/Middle";
 import Right from "./components/layout/Right";
+import Navbar from "./components/Navbar";
+import PopupManager from "./components/PopupManager";
 
 function App() {
   return (
     <>
       <CssBaseline />
+      <PopupManager />
       <Box
         sx={{
           display: "flex",
           flexDirection: "column",
           height: "100vh",
+          width: "100vw",
           overflow: "hidden",
         }}
       >
