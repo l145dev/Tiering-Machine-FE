@@ -1,4 +1,5 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
+import Betting from "../Betting";
 
 const Right = () => {
   return (
@@ -8,12 +9,10 @@ const Right = () => {
         borderLeft: "1px solid",
         borderColor: "divider",
         p: 2,
+        overflow: "hidden", // Ensure internal scrolling works if needed
       }}
     >
-      <Typography variant="h6">Right Sidebar</Typography>
-      <Typography variant="body2" color="text.secondary">
-        Details or extra info go here.
-      </Typography>
+      <Betting />
     </Box>
   );
 };
