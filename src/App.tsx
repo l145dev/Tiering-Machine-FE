@@ -1,5 +1,6 @@
 import { Box, CssBaseline, Typography } from "@mui/material";
 import Navbar from "./components/Navbar";
+import ComplianceMonitor from "./components/ComplianceMonitor";
 
 function App() {
   return (
@@ -35,10 +36,13 @@ function App() {
             }}
           >
             <Typography variant="h4" gutterBottom>
-              Main Content
+              🔴 Surveillance System Active
             </Typography>
-            <Typography>
-              This is the main content area taking up 60% of the width.
+            <Typography gutterBottom>
+              The ComplianceMonitor is now streaming your webcam to the backend for facial recognition analysis.
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Look at the bottom-right corner to see the live feed and status.
             </Typography>
           </Box>
 
@@ -58,6 +62,9 @@ function App() {
           </Box>
         </Box>
       </Box>
+
+      {/* Surveillance Component */}
+      <ComplianceMonitor citizenId="CITIZEN-001" />
     </>
   );
 }
