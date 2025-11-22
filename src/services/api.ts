@@ -25,7 +25,7 @@ export interface ApiBet {
   payoutPoints: number;
   lossPoints: number;
   actualOutcome: boolean | null;
-  resolutionDate: string;
+  time: string;
 }
 
 export interface ApiLeaderboardEntry {

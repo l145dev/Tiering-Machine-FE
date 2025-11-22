@@ -29,13 +29,20 @@ const Betting = () => {
   }, []);
 
   const getCreatorName = (creator: any) => {
-    if (typeof creator === 'string') return creator;
-    return creator?.username || 'Unknown';
+    if (typeof creator === "string") return creator;
+    return creator?.username || "Unknown";
   };
 
   if (loading) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
         <CircularProgress size={24} />
       </Box>
     );
@@ -101,7 +108,7 @@ const Betting = () => {
                   Created by {getCreatorName(bet.creator)}
                 </Typography>
                 <Typography variant="caption" fontWeight="bold">
-                  {new Date(bet.resolutionDate).toLocaleDateString()}
+                  {bet.time}
                 </Typography>
               </Box>
             </Box>

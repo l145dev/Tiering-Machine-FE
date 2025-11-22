@@ -22,7 +22,7 @@ const Middle = () => {
       {/* Macrodata Refinement Game Area */}
       <Box
         sx={{
-          height: "55%",
+          flex: "1 1 0",
           position: "relative",
           minHeight: 0,
           overflow: "hidden",
@@ -40,12 +40,20 @@ const Middle = () => {
           borderColor: "divider",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
       >
-        <Box sx={{ p: 1, borderBottom: "1px solid", borderColor: "divider" }}>
+        <Box
+          sx={{
+            p: 1,
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            flexShrink: 0,
+          }}
+        >
           <Typography variant="subtitle2">Leaderboard</Typography>
         </Box>
-        <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+        <Box sx={{ flex: 1, overflow: "hidden" }}>
           <Leaderboard />
         </Box>
       </Box>
