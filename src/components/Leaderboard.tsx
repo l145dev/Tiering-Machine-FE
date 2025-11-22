@@ -6,14 +6,19 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemButton,
   ListItemAvatar,
   ListItemText,
   Paper,
   Typography,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
-import { type ApiLeaderboardEntry, fetchLeaderboard } from "../services/api";
+import { type ApiLeaderboardEntry, fetchLeaderboard, type LogEntry, fetchUserLogs } from "../services/api";
 
 const Leaderboard = () => {
   const { user } = useUser();
@@ -22,6 +27,35 @@ const Leaderboard = () => {
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{
+    id: number;
+    name: string;
+    points: number;
+  } | null>(null);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+
+  const handleUserClick = async (user: {
+    id: number;
+    name: string;
+    points: number;
+  }) => {
+    setSelectedUser(user);
+    setLoadingLogs(true);
+    try {
+      const userLogs = await fetchUserLogs(user.id);
+      setLogs(userLogs);
+    } catch (err) {
+      console.error("Failed to fetch logs:", err);
+    } finally {
+      setLoadingLogs(false);
+    }
+  };
+
+  const handleCloseLogs = () => {
+    setSelectedUser(null);
+    setLogs([]);
+  };
 
   const loadLeaderboard = useCallback(async () => {
     try {
@@ -91,7 +125,7 @@ const Leaderboard = () => {
       <Box sx={{ flexGrow: 1, overflowY: "auto", position: "relative" }}>
         <List disablePadding>
           {leaderboardData.map((item) => (
-            <ListItem
+            <Box
               key={item.id}
               sx={{
                 "&:nth-of-type(odd)": {
@@ -102,31 +136,43 @@ const Leaderboard = () => {
                 },
               }}
             >
-              <Typography
-                variant="body1"
-                sx={{
-                  width: 40,
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  mr: 2,
-                }}
-              >
-                {item.rank}
-              </Typography>
-              <ListItemAvatar>
-                <Avatar
-                  alt={item.name}
-                  src={`https://i.pravatar.cc/150?u=${item.id}`}
-                />
-              </ListItemAvatar>
-              <ListItemText
-                primary={item.name}
-                primaryTypographyProps={{ fontWeight: 500 }}
-              />
-              <Typography variant="body1" fontWeight="bold">
-                {item.points.toLocaleString()} pts
-              </Typography>
-            </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() =>
+                    handleUserClick({
+                      id: item.id,
+                      name: item.name,
+                      points: item.points,
+                    })
+                  }
+                >
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      width: 40,
+                      textAlign: "center",
+                      fontWeight: "bold",
+                      mr: 2,
+                    }}
+                  >
+                    {item.rank}
+                  </Typography>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt={item.name}
+                      src={`https://i.pravatar.cc/150?u=${item.id}`}
+                    />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={item.name}
+                    primaryTypographyProps={{ fontWeight: 500 }}
+                  />
+                  <Typography variant="body1" fontWeight="bold">
+                    {item.points.toLocaleString()} pts
+                  </Typography>
+                </ListItemButton>
+              </ListItem>
+            </Box>
           ))}
         </List>
 
@@ -188,31 +234,132 @@ const Leaderboard = () => {
         }}
       >
         <List disablePadding>
-          <ListItem>
-            {" "}
-            {/* Light blue highlight for user */}
-            <Typography
-              variant="body1"
-              sx={{ width: 40, textAlign: "center", fontWeight: "bold", mr: 2 }}
-            >
-              {user?.rank}
-            </Typography>
-            <ListItemAvatar>
-              <Avatar
-                alt={user?.username}
-                src={`https://i.pravatar.cc/150?u=${user?.id}`}
-              />
-            </ListItemAvatar>
-            <ListItemText
-              primary={"You"}
-              slotProps={{ primary: { fontWeight: 900 } }}
-            />
-            <Typography variant="body1" fontWeight="bold">
-              {user?.total_points.toLocaleString()} pts
-            </Typography>
-          </ListItem>
+          <Box>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() =>
+                  user &&
+                  handleUserClick({
+                    id: user.id,
+                    name: user.username,
+                    points: user.total_points,
+                  })
+                }
+              >
+                {" "}
+                {/* Light blue highlight for user */}
+                <Typography
+                  variant="body1"
+                  sx={{ width: 40, textAlign: "center", fontWeight: "bold", mr: 2 }}
+                >
+                  {user?.rank}
+                </Typography>
+                <ListItemAvatar>
+                  <Avatar
+                    alt={user?.username}
+                    src={`https://i.pravatar.cc/150?u=${user?.id}`}
+                  />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={"You"}
+                  slotProps={{ primary: { fontWeight: 900 } }}
+                />
+                <Typography variant="body1" fontWeight="bold">
+                  {user?.total_points.toLocaleString()} pts
+                </Typography>
+              </ListItemButton>
+            </ListItem>
+          </Box>
         </List>
       </Paper>
+
+      {/* Logs Dialog */}
+      <Dialog
+        open={selectedUser !== null}
+        onClose={handleCloseLogs}
+        fullWidth
+        maxWidth="sm"
+      >
+        {selectedUser && (
+          <>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                p: 2,
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Avatar
+                  alt={selectedUser.name}
+                  src={`https://i.pravatar.cc/150?u=${selectedUser.id}`}
+                  sx={{ width: 56, height: 56 }}
+                />
+                <Typography variant="h6" fontWeight="bold">
+                  {selectedUser.name}
+                </Typography>
+              </Box>
+              <Typography variant="h6" fontWeight="bold" color="primary">
+                {selectedUser.points.toLocaleString()} pts
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                height: "2px",
+                bgcolor: "error.main",
+                width: "100%",
+                mb: 2,
+              }}
+            />
+
+            <DialogContent>
+              <Typography
+                variant="h6"
+                gutterBottom
+                sx={{
+                  textDecoration: "underline",
+                  textDecorationColor: "red",
+                  mb: 2,
+                }}
+              >
+                Activity
+              </Typography>
+              {loadingLogs ? (
+                <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <List dense>
+                  {logs.length > 0 ? (
+                    logs.map((log) => (
+                      <ListItem key={log.id}>
+                        <ListItemText
+                          primary={`${new Date(
+                            log.logTime
+                          ).toLocaleString()} : ${log.details}`}
+                        />
+                      </ListItem>
+                    ))
+                  ) : (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      align="center"
+                    >
+                      No logs found.
+                    </Typography>
+                  )}
+                </List>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseLogs}>Close</Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </Box>
   );
 };

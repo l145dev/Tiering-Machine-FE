@@ -60,6 +60,13 @@ export interface ReportResponse {
   report_points_earned: number;
 }
 
+export interface LogEntry {
+  id: number;
+  username: string;
+  details: string;
+  logTime: string;
+}
+
 export interface TierResponse {
   tier: "dreg" | "citizen" | "elite" | null;
 }
@@ -122,6 +129,14 @@ export const reportCitizen = async (
   return response.json();
 };
 
+export const fetchUserLogs = async (userId: number): Promise<LogEntry[]> => {
+  const response = await fetch(`${BASE_URL}/logs/user/${userId}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch user logs");
+  }
+  return response.json();
+};
+    
 export const fetchTierByUsername = async (
   username: string
 ): Promise<TierResponse> => {
