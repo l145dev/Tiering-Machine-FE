@@ -313,52 +313,7 @@ export default class OpenSimplexNoise {
         }
     }
 
-    public noise3D(x: number, y: number, z: number): number {
-        const stretchOffset = (x + y + z) * constants.STRETCH_3D;
-        const xs = x + stretchOffset;
-        const ys = y + stretchOffset;
-        const zs = z + stretchOffset;
-        const xsb = Math.floor(xs);
-        const ysb = Math.floor(ys);
-        const zsb = Math.floor(zs);
-        const squishOffset = (xsb + ysb + zsb) * constants.SQUISH_3D;
-        const dx0 = x - (xsb + squishOffset);
-        const dy0 = y - (ysb + squishOffset);
-        const dz0 = z - (zsb + squishOffset);
-        const xins = xs - xsb;
-        const yins = ys - ysb;
-        const zins = zs - zsb;
-        const inSum = xins + yins + zins;
-        const hash =
-            (yins - zins + 1) |
-            ((xins - yins + 1) << 1) |
-            ((xins - zins + 1) << 2) |
-            (inSum << 3) |
-            ((inSum + zins) << 5) |
-            ((inSum + yins) << 7) |
-            ((inSum + xins) << 9);
-        let value = 0;
-        for (let c = this.lookup3D[hash]; c !== undefined; c = c.next!) {
-            const dx = dx0 + c.dx;
-            const dy = dy0 + c.dy;
-            const dz = dz0 + c.dz;
-            const attn = 2 - dx * dx - dy * dy - dz * dz;
-            if (attn > 0) {
-                const px = xsb + c.xsb;
-                const py = ysb + c.ysb;
-                const pz = zsb + c.zsb;
-                const indexPartA = this.perm[px & 0xff];
-                const indexPartB = this.perm[(indexPartA + py) & 0xff];
-                const index = this.perm3D[(indexPartB + pz) & 0xff];
-                const valuePart =
-                    constants.gradients3D[index] * dx +
-                    constants.gradients3D[index + 1] * dy +
-                    constants.gradients3D[index + 2] * dz;
-                value += attn * attn * attn * attn * valuePart;
-            }
-        }
-        return value * constants.NORM_3D;
-    }
+
 
     private initialize(): void {
         const contributions2D: Contribution2[] = [];

@@ -1,7 +1,49 @@
-import { Box, Paper, Typography } from "@mui/material";
-import { eventsData } from "../mock_data/eventsData";
+import { Box, CircularProgress, Paper, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useUser } from "../context/UserContext";
+import { type ApiEvent, fetchEvents } from "../services/api";
 
 const Events = () => {
+  const { user } = useUser();
+  const [events, setEvents] = useState<ApiEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadEvents = async () => {
+      if (!user) return;
+      try {
+        setLoading(true);
+        const data = await fetchEvents();
+        setEvents(data);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to load events:", err);
+        setError("Failed to load events. The Ministry of Truth is experiencing technical difficulties.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEvents();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 2, color: "error.main", textAlign: "center" }}>
+        <Typography variant="body2">{error}</Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}
@@ -17,7 +59,7 @@ const Events = () => {
           pr: 1,
         }}
       >
-        {eventsData.map((event) => (
+        {events.map((event) => (
           <Paper
             key={event.id}
             variant="outlined"
@@ -58,7 +100,7 @@ const Events = () => {
                 {event.description}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Hosted by {event.creator}
+                Hosted by {event.creator.username}
               </Typography>
             </Box>
 
@@ -91,7 +133,7 @@ const Events = () => {
                   fontWeight="bold"
                   lineHeight={1.2}
                 >
-                  {event.date}
+                  {new Date(event.eventDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </Typography>
               </Box>
 
@@ -103,17 +145,17 @@ const Events = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   p: 1,
-                  bgcolor: "#E3F2FD", // Light Blue for cost
-                  color: "#1565C0", // Dark Blue Text
+                  bgcolor: event.reward >= 0 ? "#E8F5E9" : "#FFEBEE", // Green for positive, Red for negative
+                  color: event.reward >= 0 ? "#2E7D32" : "#C62828",
                   cursor: "pointer",
                   transition: "background-color 0.2s",
                   "&:hover": {
-                    bgcolor: "#BBDEFB", // Darker Blue Hover
+                    bgcolor: event.reward >= 0 ? "#C8E6C9" : "#FFCDD2",
                   },
                 }}
               >
                 <Typography variant="caption" align="center" fontWeight="bold">
-                  {event.reward} pts
+                  {event.reward > 0 ? "+" : ""}{event.reward} pts
                 </Typography>
               </Box>
             </Box>
