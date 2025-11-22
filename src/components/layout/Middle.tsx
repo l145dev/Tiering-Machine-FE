@@ -25,7 +25,7 @@ const Middle = () => {
 
         {/* Overlay Title */}
         <Box sx={{ position: 'absolute', top: 10, left: 20, pointerEvents: 'none' }}>
-          <Typography variant="h6" sx={{ opacity: 0.7, color: '#ABFFE9' }}>Macrodata Refinement</Typography>
+          <Typography variant="h6" sx={{ opacity: 0.7, color: '#ABFFE9' }}>Sourcing The Open</Typography>
         </Box>
       </Box>
 

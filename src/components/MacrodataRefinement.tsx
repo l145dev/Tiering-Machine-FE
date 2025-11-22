@@ -227,7 +227,6 @@ const MacrodataRefinement = () => {
                 shaderLayer.noStroke();
 
                 // Load images asynchronously
-                lumonImage = await p.loadImage(lumonImg);
                 nopeImage = await p.loadImage(nopeImg);
 
                 startOver();
