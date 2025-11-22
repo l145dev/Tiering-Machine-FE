@@ -103,7 +103,7 @@ const Leaderboard = () => {
           borderTop: "1px solid",
           borderColor: "divider",
           bgcolor: "background.paper",
-          zIndex: 1,
+          zIndex: 20, // Above dreg overlay (z-index 10)
           borderRadius: 0, // Override theme border radius
         }}
       >

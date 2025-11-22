@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import Leaderboard from "../Leaderboard";
-import Marquee from "../Marquee";
 import MacrodataRefinement from "../MacrodataRefinement";
+import Marquee from "../Marquee";
 
 const Middle = () => {
   return (
@@ -20,20 +20,34 @@ const Middle = () => {
       <Marquee />
 
       {/* Macrodata Refinement Game Area */}
-      <Box sx={{ flexGrow: 1, position: "relative", minHeight: 0, overflow: "hidden" }}>
+      <Box
+        sx={{
+          height: "55%",
+          position: "relative",
+          minHeight: 0,
+          overflow: "hidden",
+        }}
+      >
         <MacrodataRefinement />
-
-        {/* Overlay Title */}
-        <Box sx={{ position: 'absolute', top: 10, left: 20, pointerEvents: 'none' }}>
-          <Typography variant="h6" sx={{ opacity: 0.7, color: '#ABFFE9' }}>Sourcing The Open</Typography>
-        </Box>
       </Box>
 
-      <Box sx={{ height: "30%", minHeight: "200px", borderTop: "1px solid", borderColor: "divider" }}>
-        <Box sx={{ p: 1 }}>
+      {/* Leaderboard Section */}
+      <Box
+        sx={{
+          height: "35%",
+          minHeight: "200px",
+          borderTop: "1px solid",
+          borderColor: "divider",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Box sx={{ p: 1, borderBottom: "1px solid", borderColor: "divider" }}>
           <Typography variant="subtitle2">Leaderboard</Typography>
         </Box>
-        <Leaderboard />
+        <Box sx={{ flexGrow: 1, overflow: "hidden" }}>
+          <Leaderboard />
+        </Box>
       </Box>
     </Box>
   );
