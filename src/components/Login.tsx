@@ -1,6 +1,9 @@
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { ThemeProvider } from "@mui/material/styles";
+import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
+import { fetchTierByUsername } from "../services/api";
+import { defaultTheme, eliteTheme } from "../theme";
 import Ads from "./Ads";
 
 const Login = () => {
@@ -9,6 +12,27 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [tier, setTier] = useState<"dreg" | "citizen" | "elite" | null>(null);
+
+  // Debounce tier checking by 500ms
+  useEffect(() => {
+    if (!identity.trim()) {
+      setTier(null);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const response = await fetchTierByUsername(identity);
+        setTier(response.tier);
+      } catch (err) {
+        console.error("Failed to fetch tier:", err);
+        setTier(null);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [identity]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,162 +51,171 @@ const Login = () => {
     }
   };
 
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        height: "100vh",
-        width: "100vw",
-        bgcolor: "background.default",
-      }}
-    >
-      {/* Left Column - Ads */}
-      <Box
-        sx={{
-          width: "20%",
-          borderRight: "1px solid",
-          borderColor: "divider",
-          p: 2,
-          overflow: "hidden",
-        }}
-      >
-        <Ads />
-      </Box>
+  const isElite = tier === "elite";
+  const currentTheme = isElite ? eliteTheme : defaultTheme;
 
-      {/* Middle Column - Login Form */}
+  return (
+    <ThemeProvider theme={currentTheme}>
       <Box
         sx={{
-          width: "60%",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRight: "1px solid",
-          borderColor: "divider",
-          p: 4,
+          height: "100vh",
+          width: "100vw",
+          bgcolor: "background.default",
         }}
       >
-        <Paper
-          elevation={0}
+        {/* Left Column - Ads (hidden for elite) */}
+        {!isElite && (
+          <Box
+            sx={{
+              width: "20%",
+              borderRight: "1px solid",
+              borderColor: "divider",
+              p: 2,
+              overflow: "hidden",
+            }}
+          >
+            <Ads />
+          </Box>
+        )}
+
+        {/* Middle Column - Login Form */}
+        <Box
           sx={{
-            maxWidth: 500,
-            width: "100%",
+            width: isElite ? "100%" : "60%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRight: !isElite ? "1px solid" : "none",
+            borderColor: "divider",
             p: 4,
-            border: "2px solid",
-            borderColor: "primary.main",
-            bgcolor: "background.paper",
           }}
         >
-          <Typography
-            variant="h3"
-            component="h1"
-            align="center"
-            gutterBottom
+          <Paper
+            elevation={0}
             sx={{
-              fontWeight: 700,
-              color: "primary.main",
-              textTransform: "uppercase",
-              letterSpacing: "0.2em",
-              mb: 4,
+              maxWidth: 500,
+              width: "100%",
+              p: 4,
+              border: "2px solid",
+              borderColor: "primary.main",
+              bgcolor: "background.paper",
             }}
           >
-            Access Terminal
-          </Typography>
-
-          <form onSubmit={handleSubmit}>
-            <TextField
-              fullWidth
-              label="Identity"
-              value={identity}
-              onChange={(e) => setIdentity(e.target.value)}
-              required
+            <Typography
+              variant="h3"
+              component="h1"
+              align="center"
+              gutterBottom
               sx={{
-                mb: 3,
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: "primary.main",
-                  },
-                },
-              }}
-              InputLabelProps={{
-                sx: { textTransform: "uppercase", letterSpacing: "1px" },
-              }}
-            />
-
-            <TextField
-              fullWidth
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              sx={{
-                mb: 4,
-                "& .MuiOutlinedInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: "primary.main",
-                  },
-                },
-              }}
-              InputLabelProps={{
-                sx: { textTransform: "uppercase", letterSpacing: "1px" },
-              }}
-            />
-
-            {error && (
-              <Typography
-                color="error"
-                align="center"
-                sx={{ mb: 2, textTransform: "uppercase" }}
-              >
-                {error}
-              </Typography>
-            )}
-
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              size="large"
-              disabled={loading}
-              sx={{
-                py: 1.5,
-                fontSize: "1.1rem",
                 fontWeight: 700,
-                letterSpacing: "2px",
+                color: "primary.main",
                 textTransform: "uppercase",
+                letterSpacing: "0.2em",
+                mb: 4,
               }}
             >
-              {loading ? "Authenticating..." : "Log In"}
-            </Button>
-          </form>
+              Access Terminal
+            </Typography>
 
-          <Typography
-            variant="caption"
-            align="center"
-            display="block"
+            <form onSubmit={handleSubmit}>
+              <TextField
+                fullWidth
+                label="Identity"
+                value={identity}
+                onChange={(e) => setIdentity(e.target.value)}
+                required
+                sx={{
+                  mb: 3,
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "primary.main",
+                    },
+                  },
+                }}
+                InputLabelProps={{
+                  sx: { textTransform: "uppercase", letterSpacing: "1px" },
+                }}
+              />
+
+              <TextField
+                fullWidth
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                sx={{
+                  mb: 4,
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "primary.main",
+                    },
+                  },
+                }}
+                InputLabelProps={{
+                  sx: { textTransform: "uppercase", letterSpacing: "1px" },
+                }}
+              />
+
+              {error && (
+                <Typography
+                  color="error"
+                  align="center"
+                  sx={{ mb: 2, textTransform: "uppercase" }}
+                >
+                  {error}
+                </Typography>
+              )}
+
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                size="large"
+                disabled={loading}
+                sx={{
+                  py: 1.5,
+                  fontSize: "1.1rem",
+                  fontWeight: 700,
+                  letterSpacing: "2px",
+                  textTransform: "uppercase",
+                }}
+              >
+                {loading ? "Authenticating..." : "Log In"}
+              </Button>
+            </form>
+
+            <Typography
+              variant="caption"
+              align="center"
+              display="block"
+              sx={{
+                mt: 4,
+                color: "text.secondary",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              All access monitored • Compliance required
+            </Typography>
+          </Paper>
+        </Box>
+
+        {/* Right Column - Ads (hidden for elite) */}
+        {!isElite && (
+          <Box
             sx={{
-              mt: 4,
-              color: "text.secondary",
-              textTransform: "uppercase",
-              letterSpacing: "1px",
+              width: "20%",
+              p: 2,
+              overflow: "hidden",
             }}
           >
-            All access monitored • Compliance required
-          </Typography>
-        </Paper>
+            <Ads />
+          </Box>
+        )}
       </Box>
-
-      {/* Right Column - Ads */}
-      <Box
-        sx={{
-          width: "20%",
-          p: 2,
-          overflow: "hidden",
-        }}
-      >
-        <Ads />
-      </Box>
-    </Box>
+    </ThemeProvider>
   );
 };
 

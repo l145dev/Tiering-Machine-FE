@@ -60,6 +60,10 @@ export interface ReportResponse {
   report_points_earned: number;
 }
 
+export interface TierResponse {
+  tier: "dreg" | "citizen" | "elite" | null;
+}
+
 export const fetchEvents = async (): Promise<ApiEvent[]> => {
   const response = await fetch(`${BASE_URL}/events`);
   if (!response.ok) {
@@ -114,6 +118,19 @@ export const reportCitizen = async (
   });
   if (!response.ok) {
     throw new Error("Report failed");
+  }
+  return response.json();
+};
+
+export const fetchTierByUsername = async (
+  username: string
+): Promise<TierResponse> => {
+  const response = await fetch(
+    `${BASE_URL}/tier?username=${encodeURIComponent(username)}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch tier");
   }
   return response.json();
 };
