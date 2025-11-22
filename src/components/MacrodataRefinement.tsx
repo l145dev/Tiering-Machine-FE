@@ -1,5 +1,5 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box, Typography } from "@mui/material";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useUser } from "../context/UserContext";
 
 interface NumberCell {
@@ -22,9 +22,26 @@ const GRID_ROWS = 10;
 const GRID_COLS = 15;
 const TOTAL_CELLS = GRID_ROWS * GRID_COLS;
 
+// Helper function to calculate coordinates
+const getCellCoordinates = (index: number, cols: number) => ({
+  x: index % cols,
+  y: Math.floor(index / cols),
+});
+
+// Helper function to get bounding box from selection
+const getBoundingBox = (start: number, end: number, cols: number) => {
+  const startCoords = getCellCoordinates(start, cols);
+  const endCoords = getCellCoordinates(end, cols);
+  return {
+    minX: Math.min(startCoords.x, endCoords.x),
+    maxX: Math.max(startCoords.x, endCoords.x),
+    minY: Math.min(startCoords.y, endCoords.y),
+    maxY: Math.max(startCoords.y, endCoords.y),
+  };
+};
+
 const MacrodataRefinement = () => {
   const { user, updateUser } = useUser();
-  const theme = useTheme();
   const [cells, setCells] = useState<NumberCell[]>([]);
   const [bins, setBins] = useState<Bin[]>([
     { id: 0, name: "WO", count: 0, goal: 100, color: "#05C3A8" },
@@ -53,37 +70,36 @@ const MacrodataRefinement = () => {
     setCells(newCells);
   }, []);
 
-  const handleMouseDown = (index: number) => {
+  const handleMouseDown = useCallback((index: number) => {
     setIsDragging(true);
     setSelection({ start: index, end: index });
-  };
+  }, []);
 
-  const handleMouseEnter = (index: number) => {
-    if (isDragging) {
-      setSelection((prev) => ({ ...prev, end: index }));
-    }
-  };
+  const handleMouseEnter = useCallback(
+    (index: number) => {
+      if (isDragging) {
+        setSelection((prev) => ({ ...prev, end: index }));
+      }
+    },
+    [isDragging]
+  );
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     if (!isDragging || selection.start === null || selection.end === null)
       return;
     setIsDragging(false);
     processSelection();
     setSelection({ start: null, end: null });
-  };
+  }, [isDragging, selection.start, selection.end]);
 
-  const processSelection = () => {
+  const processSelection = useCallback(() => {
     if (selection.start === null || selection.end === null) return;
 
-    const startX = selection.start % GRID_COLS;
-    const startY = Math.floor(selection.start / GRID_COLS);
-    const endX = selection.end % GRID_COLS;
-    const endY = Math.floor(selection.end / GRID_COLS);
-
-    const minX = Math.min(startX, endX);
-    const maxX = Math.max(startX, endX);
-    const minY = Math.min(startY, endY);
-    const maxY = Math.max(startY, endY);
+    const { minX, maxX, minY, maxY } = getBoundingBox(
+      selection.start,
+      selection.end,
+      GRID_COLS
+    );
 
     const selectedCells = cells.filter(
       (cell) =>
@@ -135,26 +151,23 @@ const MacrodataRefinement = () => {
       setFeedback("nope");
       setTimeout(() => setFeedback(null), 500);
     }
-  };
+  }, [cells, selection.start, selection.end, user, updateUser]);
 
-  const isSelected = (index: number) => {
-    if (selection.start === null || selection.end === null) return false;
+  const isSelected = useMemo(
+    () => (index: number) => {
+      if (selection.start === null || selection.end === null) return false;
 
-    const startX = selection.start % GRID_COLS;
-    const startY = Math.floor(selection.start / GRID_COLS);
-    const endX = selection.end % GRID_COLS;
-    const endY = Math.floor(selection.end / GRID_COLS);
+      const { minX, maxX, minY, maxY } = getBoundingBox(
+        selection.start,
+        selection.end,
+        GRID_COLS
+      );
+      const { x: curX, y: curY } = getCellCoordinates(index, GRID_COLS);
 
-    const minX = Math.min(startX, endX);
-    const maxX = Math.max(startX, endX);
-    const minY = Math.min(startY, endY);
-    const maxY = Math.max(startY, endY);
-
-    const curX = index % GRID_COLS;
-    const curY = Math.floor(index / GRID_COLS);
-
-    return curX >= minX && curX <= maxX && curY >= minY && curY <= maxY;
-  };
+      return curX >= minX && curX <= maxX && curY >= minY && curY <= maxY;
+    },
+    [selection.start, selection.end]
+  );
 
   return (
     <Box
@@ -270,8 +283,7 @@ const MacrodataRefinement = () => {
                 fontWeight="bold"
                 sx={{
                   color: "text.primary",
-                  textShadow:
-                    theme.palette.mode === "dark" ? "0 1px 2px black" : "none",
+                  textShadow: "0 1px 2px black",
                 }}
               >
                 {bin.name}
@@ -280,8 +292,7 @@ const MacrodataRefinement = () => {
                 variant="caption"
                 sx={{
                   color: "text.primary",
-                  textShadow:
-                    theme.palette.mode === "dark" ? "0 1px 2px black" : "none",
+                  textShadow: "0 1px 2px black",
                 }}
               >
                 {Math.floor((bin.count / bin.goal) * 100)}%

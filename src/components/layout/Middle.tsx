@@ -1,9 +1,13 @@
 import { Box } from "@mui/material";
+import { useUser } from "../../context/UserContext";
+import Greeting from "../Greeting";
 import Leaderboard from "../Leaderboard";
 import MacrodataRefinement from "../MacrodataRefinement";
 import Marquee from "../Marquee";
 
 const Middle = () => {
+  const { user } = useUser();
+
   return (
     <Box
       component="main"
@@ -28,7 +32,7 @@ const Middle = () => {
           overflow: "hidden",
         }}
       >
-        <MacrodataRefinement />
+        {user?.tier === "elite" ? <Greeting /> : <MacrodataRefinement />}
       </Box>
 
       {/* Leaderboard Section */}

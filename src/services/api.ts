@@ -136,7 +136,7 @@ export const fetchUserLogs = async (userId: number): Promise<LogEntry[]> => {
   }
   return response.json();
 };
-    
+
 export const fetchTierByUsername = async (
   username: string
 ): Promise<TierResponse> => {
@@ -146,6 +146,20 @@ export const fetchTierByUsername = async (
 
   if (!response.ok) {
     throw new Error("Failed to fetch tier");
+  }
+  return response.json();
+};
+
+export const setDebugScore = async (citizenId: number, score: number) => {
+  const response = await fetch(`${BASE_URL}/bets/debug/set-score`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ citizenId, score }),
+  });
+  if (!response.ok) {
+    throw new Error("Failed to set debug score");
   }
   return response.json();
 };

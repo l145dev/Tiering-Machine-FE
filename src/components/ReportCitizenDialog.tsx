@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { useUser } from "../context/UserContext";
 import { reportCitizen } from "../services/api";
 
 interface ReportCitizenDialogProps {
@@ -32,6 +33,7 @@ const ReportCitizenDialog = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { user } = useUser();
 
   // Update targetId when prefilledTargetId changes
   useState(() => {
@@ -153,6 +155,11 @@ const ReportCitizenDialog = ({
               color="error"
               variant="contained"
               disabled={loading}
+              sx={{
+                "&:hover": {
+                  color: user?.tier === "elite" ? "#D4AF37" : "inherit",
+                },
+              }}
             >
               {loading ? "Submitting..." : "Submit Report"}
             </Button>

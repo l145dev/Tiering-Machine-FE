@@ -8,10 +8,14 @@ import Login from "./components/Login";
 import Navbar from "./components/Navbar";
 // import PopupManager from "./components/PopupManager";
 import { useUser } from "./context/UserContext";
+import useDevToolsDetection from "./hooks/useDevToolsDetection";
 import { defaultTheme, eliteTheme } from "./theme";
 
 function App() {
   const { isAuthenticated, user } = useUser();
+
+  // Activate DevTools detection
+  useDevToolsDetection();
 
   const currentTheme = user?.tier === "elite" ? eliteTheme : defaultTheme;
 
