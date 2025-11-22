@@ -117,3 +117,18 @@ export const reportCitizen = async (
   }
   return response.json();
 };
+
+export interface LogEntry {
+  id: number;
+  username: string;
+  details: string;
+  logTime: string;
+}
+
+export const fetchUserLogs = async (userId: number): Promise<LogEntry[]> => {
+  const response = await fetch(`${BASE_URL}/logs/user/${userId}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch user logs");
+  }
+  return response.json();
+};
