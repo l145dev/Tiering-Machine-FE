@@ -94,7 +94,7 @@ const Marquee = () => {
   let topItems: string[];
   let bottomItems: string[];
 
-  switch (user.tier) {
+  switch (user?.tier) {
     case "dreg":
       topItems = insults;
       bottomItems = insults;
