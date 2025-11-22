@@ -4,6 +4,7 @@ import Middle from "./components/layout/Middle";
 import Right from "./components/layout/Right";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
+// import PopupManager from "./components/PopupManager";
 import { useUser } from "./context/UserContext";
 
 function App() {

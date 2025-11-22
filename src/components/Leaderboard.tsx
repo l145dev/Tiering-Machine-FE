@@ -64,27 +64,33 @@ const Leaderboard = () => {
               top: 0,
               left: 0,
               right: 0,
-              height: "560px", // Approximate height of 10 items
+              height: "560px", // This height acts as the "track" for the sticky element
               backdropFilter: "blur(8px)",
               bgcolor: "rgba(0, 0, 0, 0.7)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
               zIndex: 10,
               borderBottom: "2px solid",
               borderColor: "primary.main",
+              // We need block or flex-col for sticky to work well, avoid 'center' align here
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <Typography
               variant="h5"
               color="primary"
               sx={{
+                position: "sticky",
+                top: "50%", // Sticks to the middle of the viewport
+                transform: "translateY(-50%)", // Perfect vertical centering
                 fontWeight: "bold",
                 textTransform: "uppercase",
                 textAlign: "center",
                 textShadow: "2px 2px 4px rgba(0,0,0,0.8)",
                 letterSpacing: "2px",
                 px: 4,
+                width: "100%",
+                margin: 0,
+                zIndex: 11,
               }}
             >
               Keep your eyes off of the elite, low life
