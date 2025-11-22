@@ -3,13 +3,12 @@ import Left from "./components/layout/Left";
 import Middle from "./components/layout/Middle";
 import Right from "./components/layout/Right";
 import Navbar from "./components/Navbar";
-import PopupManager from "./components/PopupManager";
 
 function App() {
   return (
     <>
       <CssBaseline />
-      <PopupManager />
+      {/* <PopupManager /> */}
       <Box
         sx={{
           display: "flex",
