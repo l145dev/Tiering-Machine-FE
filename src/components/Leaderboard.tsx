@@ -2,23 +2,29 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   Avatar,
   Box,
+  Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
   IconButton,
   List,
   ListItem,
-  ListItemButton,
   ListItemAvatar,
+  ListItemButton,
   ListItemText,
   Paper,
   Typography,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  Button,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
-import { type ApiLeaderboardEntry, fetchLeaderboard, type LogEntry, fetchUserLogs } from "../services/api";
+import {
+  type ApiLeaderboardEntry,
+  fetchLeaderboard,
+  fetchUserLogs,
+  type LogEntry,
+} from "../services/api";
+import ReportCitizenDialog from "./ReportCitizenDialog";
 
 const Leaderboard = () => {
   const { user } = useUser();
@@ -34,6 +40,7 @@ const Leaderboard = () => {
   } | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
 
   const handleUserClick = async (user: {
     id: number;
@@ -55,6 +62,14 @@ const Leaderboard = () => {
   const handleCloseLogs = () => {
     setSelectedUser(null);
     setLogs([]);
+  };
+
+  const handleOpenReport = () => {
+    setReportDialogOpen(true);
+  };
+
+  const handleCloseReport = () => {
+    setReportDialogOpen(false);
   };
 
   const loadLeaderboard = useCallback(async () => {
@@ -250,7 +265,12 @@ const Leaderboard = () => {
                 {/* Light blue highlight for user */}
                 <Typography
                   variant="body1"
-                  sx={{ width: 40, textAlign: "center", fontWeight: "bold", mr: 2 }}
+                  sx={{
+                    width: 40,
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    mr: 2,
+                  }}
                 >
                   {user?.rank}
                 </Typography>
@@ -354,12 +374,30 @@ const Leaderboard = () => {
                 </List>
               )}
             </DialogContent>
-            <DialogActions>
+            <DialogActions sx={{ justifyContent: "space-between" }}>
+              <Button
+                onClick={handleOpenReport}
+                color="error"
+                variant="outlined"
+              >
+                Report Citizen
+              </Button>
               <Button onClick={handleCloseLogs}>Close</Button>
             </DialogActions>
           </>
         )}
       </Dialog>
+
+      {/* Report Citizen Dialog */}
+      {user && selectedUser && (
+        <ReportCitizenDialog
+          open={reportDialogOpen}
+          onClose={handleCloseReport}
+          reporterId={user.id}
+          prefilledTargetId={selectedUser.id}
+          prefilledTargetName={selectedUser.name}
+        />
+      )}
     </Box>
   );
 };
