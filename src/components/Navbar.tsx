@@ -78,7 +78,13 @@ const Navbar = () => {
               color="error"
               size="small"
               onClick={handleReportOpen}
-              sx={{ fontWeight: "bold", letterSpacing: 1 }}
+              sx={{
+                fontWeight: "bold",
+                letterSpacing: 1,
+                "&:hover": {
+                  color: user?.tier === "elite" ? "#D4AF37" : "inherit",
+                },
+              }}
             >
               Report Citizen
             </Button>

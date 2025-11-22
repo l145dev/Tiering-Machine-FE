@@ -301,7 +301,12 @@ const Events = () => {
                 variant="contained"
                 color={selectedEvent.reward >= 0 ? "success" : "error"}
                 disableElevation
-                sx={{ fontWeight: "bold" }}
+                sx={{
+                  fontWeight: "bold",
+                  "&:hover": {
+                    color: user?.tier === "elite" ? "#D4AF37" : "inherit",
+                  },
+                }}
               >
                 {selectedEvent.reward > 0 ? "+" : ""}
                 {selectedEvent.reward} pts
