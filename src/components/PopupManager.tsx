@@ -25,7 +25,7 @@ const PopupManager = () => {
   const [position, setPosition] = useState({ top: "50%", left: "50%" });
 
   useEffect(() => {
-    if (user.tier !== "dreg") {
+    if (user?.tier !== "dreg") {
       setIsVisible(false);
       return;
     }
@@ -42,7 +42,7 @@ const PopupManager = () => {
     }, 5000); // 30 seconds
 
     return () => clearInterval(interval);
-  }, [user.tier]);
+  }, [user?.tier]);
 
   if (!isVisible || !content) return null;
 

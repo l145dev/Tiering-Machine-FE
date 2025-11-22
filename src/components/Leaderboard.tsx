@@ -57,7 +57,7 @@ const Leaderboard = () => {
         </List>
 
         {/* Dreg Overlay - Blur top 10 */}
-        {user.tier === "dreg" && (
+        {user?.tier === "dreg" && (
           <Box
             sx={{
               position: "absolute",
@@ -115,12 +115,12 @@ const Leaderboard = () => {
               variant="body1"
               sx={{ width: 40, textAlign: "center", fontWeight: "bold", mr: 2 }}
             >
-              {user.rank}
+              {user?.rank}
             </Typography>
             <ListItemAvatar>
               <Avatar
-                alt={user.username}
-                src={`https://i.pravatar.cc/150?u=${user.id}`}
+                alt={user?.username}
+                src={`https://i.pravatar.cc/150?u=${user?.id}`}
               />
             </ListItemAvatar>
             <ListItemText
@@ -128,7 +128,7 @@ const Leaderboard = () => {
               slotProps={{ primary: { fontWeight: 900 } }}
             />
             <Typography variant="body1" fontWeight="bold">
-              {user.total_points.toLocaleString()} pts
+              {user?.total_points.toLocaleString()} pts
             </Typography>
           </ListItem>
         </List>

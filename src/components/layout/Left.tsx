@@ -16,7 +16,7 @@ const Left = () => {
         overflow: "hidden",
       }}
     >
-      {user.tier === "elite" ? <Events /> : <Ads />}
+      {user?.tier === "elite" ? <Events /> : <Ads />}
     </Box>
   );
 };

@@ -11,8 +11,11 @@ export interface UserProfile {
 }
 
 interface UserContextType {
-  user: UserProfile;
+  user: UserProfile | null;
+  isAuthenticated: boolean;
   updateUser: (updates: Partial<UserProfile>) => void;
+  login: (identity: string, password: string) => Promise<boolean>;
+  logout: () => void;
 }
 
 // Default placeholder user
@@ -29,23 +32,72 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<UserProfile>(() => {
-    // Load from localStorage or use default
-    const savedUser = localStorage.getItem("user_profile");
-    return savedUser ? JSON.parse(savedUser) : defaultUser;
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    // Load from localStorage or use null
+    const savedAuth = localStorage.getItem("isAuthenticated");
+    if (savedAuth === "true") {
+      const savedUser = localStorage.getItem("user_profile");
+      return savedUser ? JSON.parse(savedUser) : null;
+    }
+    return null;
+  });
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem("isAuthenticated") === "true";
   });
 
   useEffect(() => {
-    // Save to localStorage whenever user changes
-    localStorage.setItem("user_profile", JSON.stringify(user));
-  }, [user]);
+    // Save to localStorage whenever user or auth state changes
+    if (user && isAuthenticated) {
+      localStorage.setItem("user_profile", JSON.stringify(user));
+      localStorage.setItem("isAuthenticated", "true");
+    } else {
+      localStorage.removeItem("user_profile");
+      localStorage.setItem("isAuthenticated", "false");
+    }
+  }, [user, isAuthenticated]);
 
   const updateUser = (updates: Partial<UserProfile>) => {
-    setUser((prev) => ({ ...prev, ...updates }));
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
+  };
+
+  const login = async (
+    identity: string,
+    password: string
+  ): Promise<boolean> => {
+    // Mock login - in production this would call an API
+    // For now, accept any identity/password and return default user
+    await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate API delay
+
+    // Mock: Use identity to determine tier (for testing)
+    let mockUser = { ...defaultUser };
+    if (identity.toLowerCase().includes("elite")) {
+      mockUser.tier = "elite";
+      mockUser.username = identity;
+    } else if (identity.toLowerCase().includes("citizen")) {
+      mockUser.tier = "citizen";
+      mockUser.username = identity;
+    } else {
+      mockUser.tier = "dreg";
+      mockUser.username = identity;
+    }
+
+    setUser(mockUser);
+    setIsAuthenticated(true);
+    return true;
+  };
+
+  const logout = () => {
+    setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem("user_profile");
+    localStorage.setItem("isAuthenticated", "false");
   };
 
   return (
-    <UserContext.Provider value={{ user, updateUser }}>
+    <UserContext.Provider
+      value={{ user, isAuthenticated, updateUser, login, logout }}
+    >
       {children}
     </UserContext.Provider>
   );
