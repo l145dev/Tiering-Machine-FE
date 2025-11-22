@@ -14,7 +14,7 @@ const Middle = () => {
         overflow: "hidden",
         borderRight: "1px solid",
         borderColor: "divider",
-        bgcolor: "#010A13",
+        bgcolor: "background.default",
       }}
     >
       <Marquee />

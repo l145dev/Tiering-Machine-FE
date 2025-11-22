@@ -132,7 +132,7 @@ const Betting = () => {
                 flexDirection: "column",
                 borderLeft: "1px solid",
                 borderColor: "divider",
-                bgcolor: "rgba(0, 0, 0, 0.2)",
+                bgcolor: "rgba(0, 0, 0, 0.05)",
                 cursor: "pointer",
                 transition: "all 0.2s",
                 "&:hover": {

@@ -1,4 +1,4 @@
-import { Box, Typography, keyframes } from "@mui/material";
+import { Box, Typography, keyframes, useTheme } from "@mui/material";
 import { useUser } from "../context/UserContext";
 import insults from "../data/insults";
 import praises from "../data/praise";
@@ -21,6 +21,12 @@ const MarqueeRow = ({
   items: string[];
   direction?: "left" | "right";
 }) => {
+  const theme = useTheme();
+  const shadowColor =
+    theme.palette.mode === "light"
+      ? "rgba(200, 200, 200, 0.5)"
+      : "rgba(26, 26, 26, 1)";
+
   // Duplicate items to ensure seamless loop
   const content = [...items, ...items];
 
@@ -45,12 +51,11 @@ const MarqueeRow = ({
         },
         "&::before": {
           left: 0,
-          background:
-            "linear-gradient(to right, rgba(26,26,26,1), transparent)",
+          background: `linear-gradient(to right, ${shadowColor}, transparent)`,
         },
         "&::after": {
           right: 0,
-          background: "linear-gradient(to left, rgba(26,26,26,1), transparent)",
+          background: `linear-gradient(to left, ${shadowColor}, transparent)`,
         },
       }}
     >

@@ -72,10 +72,10 @@ const Leaderboard = () => {
               key={item.id}
               sx={{
                 "&:nth-of-type(odd)": {
-                  bgcolor: "action.hover", // Light gray
+                  bgcolor: "action.hover",
                 },
                 "&:nth-of-type(even)": {
-                  bgcolor: "background.default", // White/Lighter gray depending on theme
+                  bgcolor: "background.paper",
                 },
               }}
             >

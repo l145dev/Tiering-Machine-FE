@@ -69,7 +69,7 @@ button:focus-visible {
 }
 
 /* CRT / Scanline Effects */
-body::before {
+body:not(.elite-tier)::before {
   content: " ";
   display: block;
   position: absolute;
@@ -155,7 +155,7 @@ body::before {
   }
 }
 
-body::after {
+body:not(.elite-tier)::after {
   content: " ";
   display: block;
   position: absolute;

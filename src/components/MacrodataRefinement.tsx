@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useUser } from "../context/UserContext";
 
@@ -24,6 +24,7 @@ const TOTAL_CELLS = GRID_ROWS * GRID_COLS;
 
 const MacrodataRefinement = () => {
   const { user, updateUser } = useUser();
+  const theme = useTheme();
   const [cells, setCells] = useState<NumberCell[]>([]);
   const [bins, setBins] = useState<Bin[]>([
     { id: 0, name: "WO", count: 0, goal: 100, color: "#05C3A8" },
@@ -31,7 +32,10 @@ const MacrodataRefinement = () => {
     { id: 2, name: "DR", count: 0, goal: 100, color: "#DF81D5" },
     { id: 3, name: "MA", count: 0, goal: 100, color: "#F9ECBB" },
   ]);
-  const [selection, setSelection] = useState<{ start: number | null; end: number | null }>({ start: null, end: null });
+  const [selection, setSelection] = useState<{
+    start: number | null;
+    end: number | null;
+  }>({ start: null, end: null });
   const [isDragging, setIsDragging] = useState(false);
   const [feedback, setFeedback] = useState<"success" | "nope" | null>(null);
 
@@ -61,7 +65,8 @@ const MacrodataRefinement = () => {
   };
 
   const handleMouseUp = () => {
-    if (!isDragging || selection.start === null || selection.end === null) return;
+    if (!isDragging || selection.start === null || selection.end === null)
+      return;
     setIsDragging(false);
     processSelection();
     setSelection({ start: null, end: null });
@@ -80,23 +85,28 @@ const MacrodataRefinement = () => {
     const minY = Math.min(startY, endY);
     const maxY = Math.max(startY, endY);
 
-    const selectedCells = cells.filter(cell =>
-      cell.x >= minX && cell.x <= maxX && cell.y >= minY && cell.y <= maxY
+    const selectedCells = cells.filter(
+      (cell) =>
+        cell.x >= minX && cell.x <= maxX && cell.y >= minY && cell.y <= maxY
     );
 
-    const targetCount = selectedCells.filter(c => c.isTarget).length;
+    const targetCount = selectedCells.filter((c) => c.isTarget).length;
     const totalCount = selectedCells.length;
 
     if (totalCount > 0 && targetCount / totalCount > 0.5) {
       setFeedback("success");
       setTimeout(() => setFeedback(null), 500);
 
-      setBins(prev => {
+      setBins((prev) => {
         const newBins = [...prev];
-        const incompleteBins = newBins.filter(b => b.count < b.goal);
+        const incompleteBins = newBins.filter((b) => b.count < b.goal);
         if (incompleteBins.length > 0) {
-          const randomBin = incompleteBins[Math.floor(Math.random() * incompleteBins.length)];
-          randomBin.count = Math.min(randomBin.count + targetCount * 2, randomBin.goal);
+          const randomBin =
+            incompleteBins[Math.floor(Math.random() * incompleteBins.length)];
+          randomBin.count = Math.min(
+            randomBin.count + targetCount * 2,
+            randomBin.goal
+          );
           if (user) {
             updateUser({ total_points: user.total_points + 10 });
           }
@@ -104,16 +114,23 @@ const MacrodataRefinement = () => {
         return newBins;
       });
 
-      setCells(prev => prev.map(cell => {
-        if (cell.x >= minX && cell.x <= maxX && cell.y >= minY && cell.y <= maxY) {
-          return {
-            ...cell,
-            value: Math.floor(Math.random() * 10),
-            isTarget: Math.random() > 0.8
-          };
-        }
-        return cell;
-      }));
+      setCells((prev) =>
+        prev.map((cell) => {
+          if (
+            cell.x >= minX &&
+            cell.x <= maxX &&
+            cell.y >= minY &&
+            cell.y <= maxY
+          ) {
+            return {
+              ...cell,
+              value: Math.floor(Math.random() * 10),
+              isTarget: Math.random() > 0.8,
+            };
+          }
+          return cell;
+        })
+      );
     } else {
       setFeedback("nope");
       setTimeout(() => setFeedback(null), 500);
@@ -144,12 +161,12 @@ const MacrodataRefinement = () => {
       sx={{
         width: "100%",
         height: "100%",
-        bgcolor: "#010A13",
-        color: "#ABFFE9",
+        bgcolor: "background.default",
+        color: "text.primary",
         display: "flex",
         flexDirection: "column",
         p: 2,
-        userSelect: "none"
+        userSelect: "none",
       }}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
@@ -162,7 +179,7 @@ const MacrodataRefinement = () => {
           gridTemplateRows: `repeat(${GRID_ROWS}, 1fr)`,
           gap: 0.5,
           mb: 2,
-          position: "relative"
+          position: "relative",
         }}
       >
         {cells.map((cell, index) => (
@@ -177,12 +194,13 @@ const MacrodataRefinement = () => {
               fontSize: cell.isTarget ? "1.2rem" : "1rem",
               fontWeight: cell.isTarget ? "bold" : "normal",
               cursor: "crosshair",
-              bgcolor: isSelected(index) ? "rgba(171, 255, 233, 0.2)" : "transparent",
-              color: cell.isTarget ? "#fff" : "inherit",
+              bgcolor: isSelected(index) ? "primary.main" : "transparent",
+              color: isSelected(index) ? "primary.contrastText" : "inherit",
+              opacity: isSelected(index) ? 0.5 : 1,
               transition: "all 0.1s",
               "&:hover": {
-                bgcolor: "rgba(171, 255, 233, 0.1)"
-              }
+                bgcolor: "action.hover",
+              },
             }}
           >
             {cell.value}
@@ -196,14 +214,14 @@ const MacrodataRefinement = () => {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              bgcolor: "rgba(0,0,0,0.8)",
-              color: feedback === "success" ? "#1EEFFF" : "#FF5252",
+              bgcolor: "background.paper",
+              color: feedback === "success" ? "success.main" : "error.main",
               px: 4,
               py: 2,
               borderRadius: 2,
               border: "1px solid currentColor",
               zIndex: 10,
-              pointerEvents: "none"
+              pointerEvents: "none",
             }}
           >
             <Typography variant="h4" fontWeight="bold">
@@ -214,14 +232,15 @@ const MacrodataRefinement = () => {
       </Box>
 
       <Box sx={{ display: "flex", gap: 2, height: "60px" }}>
-        {bins.map(bin => (
+        {bins.map((bin) => (
           <Box
             key={bin.id}
             sx={{
               flex: 1,
-              border: "1px solid #333",
+              border: "1px solid",
+              borderColor: "divider",
               position: "relative",
-              bgcolor: "rgba(0,0,0,0.3)"
+              bgcolor: "action.hover",
             }}
           >
             <Box
@@ -232,7 +251,7 @@ const MacrodataRefinement = () => {
                 right: 0,
                 height: `${(bin.count / bin.goal) * 100}%`,
                 bgcolor: bin.color,
-                transition: "height 0.5s ease"
+                transition: "height 0.5s ease",
               }}
             />
             <Box
@@ -243,13 +262,28 @@ const MacrodataRefinement = () => {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                zIndex: 1
+                zIndex: 1,
               }}
             >
-              <Typography variant="caption" fontWeight="bold" sx={{ color: "#fff", textShadow: "0 1px 2px black" }}>
+              <Typography
+                variant="caption"
+                fontWeight="bold"
+                sx={{
+                  color: "text.primary",
+                  textShadow:
+                    theme.palette.mode === "dark" ? "0 1px 2px black" : "none",
+                }}
+              >
                 {bin.name}
               </Typography>
-              <Typography variant="caption" sx={{ color: "#fff", textShadow: "0 1px 2px black" }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.primary",
+                  textShadow:
+                    theme.palette.mode === "dark" ? "0 1px 2px black" : "none",
+                }}
+              >
                 {Math.floor((bin.count / bin.goal) * 100)}%
               </Typography>
             </Box>
