@@ -279,7 +279,7 @@ const Beams: FC<BeamsProps> = ({
           width={beamWidth}
           height={beamHeight}
         />
-        <DirLight color={lightColor} position={[0, 3, 10]} />
+        <DirLight color={lightColor} position={[0, , 10]} />
       </group>
       <ambientLight intensity={1} />
       <color attach="background" args={["#000000"]} />

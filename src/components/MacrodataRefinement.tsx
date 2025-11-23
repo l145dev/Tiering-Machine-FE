@@ -1,242 +1,187 @@
 import { Box, Typography } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import { useUser } from "../context/UserContext";
-
-interface NumberCell {
-  id: number;
-  value: number;
-  isTarget: boolean;
-  x: number;
-  y: number;
-}
-
-interface Bin {
-  id: number;
-  name: string;
-  count: number;
-  goal: number;
-  color: string;
-}
 
 const GRID_ROWS = 10;
 const GRID_COLS = 15;
-const TOTAL_CELLS = GRID_ROWS * GRID_COLS;
 
-// Helper function to calculate coordinates
-const getCellCoordinates = (index: number, cols: number) => ({
-  x: index % cols,
-  y: Math.floor(index / cols),
+// Helper to get coordinates from a single index
+const getCoords = (index: number) => ({
+  x: index % GRID_COLS,
+  y: Math.floor(index / GRID_COLS),
 });
 
-// Helper function to get bounding box from selection
-const getBoundingBox = (start: number, end: number, cols: number) => {
-  const startCoords = getCellCoordinates(start, cols);
-  const endCoords = getCellCoordinates(end, cols);
-  return {
-    minX: Math.min(startCoords.x, endCoords.x),
-    maxX: Math.max(startCoords.x, endCoords.x),
-    minY: Math.min(startCoords.y, endCoords.y),
-    maxY: Math.max(startCoords.y, endCoords.y),
-  };
-};
+// Sound file paths (User must place these files in the correct location, e.g., src/assets/)
+// NOTE: You need to place your actual sound files in the src/assets/ folder.
+const SUCCESS_SOUND_PATH = new URL("../assets/sound_success.mp3", import.meta.url).href;
+const NOPE_SOUND_PATH = new URL("../assets/sound_nope.mp3", import.meta.url).href;
 
 const MacrodataRefinement = () => {
   const { user, updateUser } = useUser();
-  const [cells, setCells] = useState<NumberCell[]>([]);
-  const [bins, setBins] = useState<Bin[]>([
-    { id: 0, name: "WO", count: 0, goal: 100, color: "#05C3A8" },
-    { id: 1, name: "FC", count: 0, goal: 100, color: "#1EEFFF" },
-    { id: 2, name: "DR", count: 0, goal: 100, color: "#DF81D5" },
-    { id: 3, name: "MA", count: 0, goal: 100, color: "#F9ECBB" },
+
+  // --- Sound Initialization ---
+  const playSuccessSound = useMemo(() => {
+    const audio = new Audio(SUCCESS_SOUND_PATH);
+    return () => {
+      audio.currentTime = 0;
+      audio.play().catch(e => console.warn("Could not play success sound (user needs to provide file):", e));
+    };
+  }, []);
+
+  const playNopeSound = useMemo(() => {
+    const audio = new Audio(NOPE_SOUND_PATH);
+    return () => {
+      audio.currentTime = 0;
+      audio.play().catch(e => console.warn("Could not play nope sound (user needs to provide file):", e));
+    };
+  }, []);
+  // ----------------------------
+
+  // State: Grid Data
+  const [cells, setCells] = useState(() =>
+    Array.from({ length: GRID_ROWS * GRID_COLS }, (_, id) => ({
+      id,
+      value: Math.floor(Math.random() * 10),
+      isTarget: Math.random() > 0.8,
+    }))
+  );
+
+  // State: Game Progress
+  const [bins, setBins] = useState([
+    { id: 0, name: "WO", count: 0, goal: 100, color: "#9f1313ff" },
+    { id: 1, name: "FC", count: 0, goal: 100, color: "#5b8d10ff" },
+    { id: 2, name: "DR", count: 0, goal: 100, color: "#113a79ff" },
+    { id: 3, name: "MA", count: 0, goal: 100, color: "#262521ff" },
   ]);
-  const [selection, setSelection] = useState<{
-    start: number | null;
-    end: number | null;
-  }>({ start: null, end: null });
-  const [isDragging, setIsDragging] = useState(false);
+
+  const [dragStart, setDragStart] = useState<number | null>(null);
+  const [dragEnd, setDragEnd] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<"success" | "nope" | null>(null);
 
-  useEffect(() => {
-    const newCells: NumberCell[] = [];
-    for (let i = 0; i < TOTAL_CELLS; i++) {
-      newCells.push({
-        id: i,
-        value: Math.floor(Math.random() * 10),
-        isTarget: Math.random() > 0.8,
-        x: i % GRID_COLS,
-        y: Math.floor(i / GRID_COLS),
-      });
-    }
-    setCells(newCells);
-  }, []);
+  const selectionBox = useMemo(() => {
+    if (dragStart === null || dragEnd === null) return null;
+    const start = getCoords(dragStart);
+    const end = getCoords(dragEnd);
+    return {
+      minX: Math.min(start.x, end.x), maxX: Math.max(start.x, end.x),
+      minY: Math.min(start.y, end.y), maxY: Math.max(start.y, end.y),
+    };
+  }, [dragStart, dragEnd]);
 
-  const handleMouseDown = useCallback((index: number) => {
-    setIsDragging(true);
-    setSelection({ start: index, end: index });
-  }, []);
+  const handleMouseUp = () => {
+    if (!selectionBox) return;
 
-  const handleMouseEnter = useCallback(
-    (index: number) => {
-      if (isDragging) {
-        setSelection((prev) => ({ ...prev, end: index }));
-      }
-    },
-    [isDragging]
-  );
+    // 1. Identify selected cells
+    const selectedIndices = cells.filter((_, i) => {
+      const { x, y } = getCoords(i);
+      return (
+        x >= selectionBox.minX && x <= selectionBox.maxX &&
+        y >= selectionBox.minY && y <= selectionBox.maxY
+      );
+    });
 
-  const handleMouseUp = useCallback(() => {
-    if (!isDragging || selection.start === null || selection.end === null)
-      return;
-    setIsDragging(false);
-    processSelection();
-    setSelection({ start: null, end: null });
-  }, [isDragging, selection.start, selection.end]);
+    // 2. Validate Selection (Logic: > 50% are targets)
+    const targetCount = selectedIndices.filter(c => c.isTarget).length;
+    const success = selectedIndices.length > 0 && (targetCount / selectedIndices.length) > 0.5;
 
-  const processSelection = useCallback(() => {
-    if (selection.start === null || selection.end === null) return;
+    // 3. Handle Outcome
+    setFeedback(success ? "success" : "nope");
+    setTimeout(() => setFeedback(null), 500);
 
-    const { minX, maxX, minY, maxY } = getBoundingBox(
-      selection.start,
-      selection.end,
-      GRID_COLS
-    );
+    if (success) {
+      playSuccessSound(); // Play success sound
 
-    const selectedCells = cells.filter(
-      (cell) =>
-        cell.x >= minX && cell.x <= maxX && cell.y >= minY && cell.y <= maxY
-    );
-
-    const targetCount = selectedCells.filter((c) => c.isTarget).length;
-    const totalCount = selectedCells.length;
-
-    if (totalCount > 0 && targetCount / totalCount > 0.5) {
-      setFeedback("success");
-      setTimeout(() => setFeedback(null), 500);
-
-      setBins((prev) => {
-        const newBins = [...prev];
-        const incompleteBins = newBins.filter((b) => b.count < b.goal);
-        if (incompleteBins.length > 0) {
-          const randomBin =
-            incompleteBins[Math.floor(Math.random() * incompleteBins.length)];
-          randomBin.count = Math.min(
-            randomBin.count + targetCount * 2,
-            randomBin.goal
-          );
-          if (user) {
-            updateUser({ total_points: user.total_points + 10 });
-          }
+      // Update Bins
+      setBins(prev => {
+        const next = [...prev];
+        const incomplete = next.filter(b => b.count < b.goal);
+        if (incomplete.length) {
+          const bin = incomplete[Math.floor(Math.random() * incomplete.length)];
+          bin.count = Math.min(bin.count + targetCount * 2, bin.goal);
+          // Update User Score
+          if (user) updateUser({ total_points: user.total_points + 10 });
         }
-        return newBins;
+        return next;
       });
 
-      setCells((prev) =>
-        prev.map((cell) => {
-          if (
-            cell.x >= minX &&
-            cell.x <= maxX &&
-            cell.y >= minY &&
-            cell.y <= maxY
-          ) {
-            return {
-              ...cell,
-              value: Math.floor(Math.random() * 10),
-              isTarget: Math.random() > 0.8,
-            };
-          }
-          return cell;
-        })
-      );
+      // Regenerate Selected Cells
+      setCells(prev => prev.map((cell, i) => {
+        const { x, y } = getCoords(i);
+        const inBox = x >= selectionBox.minX && x <= selectionBox.maxX &&
+          y >= selectionBox.minY && y <= selectionBox.maxY;
+        if (!inBox) return cell;
+
+        return {
+          ...cell,
+          value: Math.floor(Math.random() * 10),
+          isTarget: Math.random() > 0.8,
+        };
+      }));
     } else {
-      setFeedback("nope");
-      setTimeout(() => setFeedback(null), 500);
+      playNopeSound(); // Play nope sound
     }
-  }, [cells, selection.start, selection.end, user, updateUser]);
 
-  const isSelected = useMemo(
-    () => (index: number) => {
-      if (selection.start === null || selection.end === null) return false;
+    setDragStart(null);
+    setDragEnd(null);
+  };
 
-      const { minX, maxX, minY, maxY } = getBoundingBox(
-        selection.start,
-        selection.end,
-        GRID_COLS
-      );
-      const { x: curX, y: curY } = getCellCoordinates(index, GRID_COLS);
-
-      return curX >= minX && curX <= maxX && curY >= minY && curY <= maxY;
-    },
-    [selection.start, selection.end]
-  );
+  const isSelected = (index: number) => {
+    if (selectionBox) {
+      const { x, y } = getCoords(index);
+      return x >= selectionBox.minX && x <= selectionBox.maxX &&
+        y >= selectionBox.minY && y <= selectionBox.maxY;
+    }
+    return false;
+  };
 
   return (
     <Box
-      sx={{
-        width: "100%",
-        height: "100%",
-        bgcolor: "background.default",
-        color: "text.primary",
-        display: "flex",
-        flexDirection: "column",
-        p: 2,
-        userSelect: "none",
-      }}
       onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onMouseLeave={() => { setDragStart(null); setDragEnd(null); }}
+      sx={{
+        width: "100%", height: "100%", p: 2,
+        bgcolor: "background.default", color: "text.primary",
+        display: "flex", flexDirection: "column", userSelect: "none",
+      }}
     >
+      {/* Grid Area */}
       <Box
         sx={{
-          flexGrow: 1,
-          display: "grid",
+          flexGrow: 1, mb: 2, position: "relative",
+          display: "grid", gap: 0.5,
           gridTemplateColumns: `repeat(${GRID_COLS}, 1fr)`,
           gridTemplateRows: `repeat(${GRID_ROWS}, 1fr)`,
-          gap: 0.5,
-          mb: 2,
-          position: "relative",
         }}
       >
         {cells.map((cell, index) => (
           <Box
             key={cell.id}
-            onMouseDown={() => handleMouseDown(index)}
-            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseDown={() => { setDragStart(index); setDragEnd(index); }}
+            onMouseEnter={() => { if (dragStart !== null) setDragEnd(index); }}
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: cell.isTarget ? "1.2rem" : "1rem",
               fontWeight: cell.isTarget ? "bold" : "normal",
               cursor: "crosshair",
+              transition: "all 0.1s",
               bgcolor: isSelected(index) ? "primary.main" : "transparent",
               color: isSelected(index) ? "primary.contrastText" : "inherit",
               opacity: isSelected(index) ? 0.5 : 1,
-              transition: "all 0.1s",
-              "&:hover": {
-                bgcolor: "action.hover",
-              },
+              "&:hover": { bgcolor: "action.hover" },
             }}
           >
             {cell.value}
           </Box>
         ))}
 
+        {/* Feedback Overlay */}
         {feedback && (
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              bgcolor: "background.paper",
-              color: feedback === "success" ? "success.main" : "error.main",
-              px: 4,
-              py: 2,
-              borderRadius: 2,
-              border: "1px solid currentColor",
-              zIndex: 10,
-              pointerEvents: "none",
-            }}
-          >
+          <Box sx={{
+            position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper", px: 4, py: 2, borderRadius: 2, border: "1px solid currentColor",
+            color: feedback === "success" ? "success.main" : "error.main",
+            pointerEvents: "none", zIndex: 10,
+          }}>
             <Typography variant="h4" fontWeight="bold">
               {feedback === "success" ? "REFINED" : "NOPE"}
             </Typography>
@@ -244,59 +189,18 @@ const MacrodataRefinement = () => {
         )}
       </Box>
 
+      {/* Progress Bins */}
       <Box sx={{ display: "flex", gap: 2, height: "60px" }}>
         {bins.map((bin) => (
-          <Box
-            key={bin.id}
-            sx={{
-              flex: 1,
-              border: "1px solid",
-              borderColor: "divider",
-              position: "relative",
-              bgcolor: "action.hover",
-            }}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: `${(bin.count / bin.goal) * 100}%`,
-                bgcolor: bin.color,
-                transition: "height 0.5s ease",
-              }}
-            />
-            <Box
-              sx={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 1,
-              }}
-            >
-              <Typography
-                variant="caption"
-                fontWeight="bold"
-                sx={{
-                  color: "text.primary",
-                  textShadow: "0 1px 2px black",
-                }}
-              >
-                {bin.name}
-              </Typography>
-              <Typography
-                variant="caption"
-                sx={{
-                  color: "text.primary",
-                  textShadow: "0 1px 2px black",
-                }}
-              >
-                {Math.floor((bin.count / bin.goal) * 100)}%
-              </Typography>
+          <Box key={bin.id} sx={{ flex: 1, border: "1px solid", borderColor: "divider", position: "relative", bgcolor: "action.hover" }}>
+            <Box sx={{
+              position: "absolute", bottom: 0, left: 0, right: 0,
+              height: `${(bin.count / bin.goal) * 100}%`,
+              bgcolor: bin.color, transition: "height 0.5s ease",
+            }} />
+            <Box sx={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
+              <Typography variant="caption" fontWeight="bold" sx={{ textShadow: "0 1px 2px black", color: "text.primary" }}>{bin.name}</Typography>
+              <Typography variant="caption" sx={{ textShadow: "0 1px 2px black", color: "text.primary" }}>{Math.floor((bin.count / bin.goal) * 100)}%</Typography>
             </Box>
           </Box>
         ))}

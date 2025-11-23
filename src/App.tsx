@@ -6,10 +6,12 @@ import Middle from "./components/layout/Middle";
 import Right from "./components/layout/Right";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
-// import PopupManager from "./components/PopupManager";
+import PopupManager from "./components/PopupManager";
+import MandatoryEntertainment from "./components/MandatoryEntertainment"; // Import here
 import { useUser } from "./context/UserContext";
 import useDevToolsDetection from "./hooks/useDevToolsDetection";
 import { defaultTheme, eliteTheme } from "./theme";
+import BackgroundCrying from "./components/BackgroundCrying";
 
 function App() {
   const { isAuthenticated, user } = useUser();
@@ -41,7 +43,12 @@ function App() {
   return (
     <ThemeProvider theme={currentTheme}>
       <CssBaseline />
-      {/* <PopupManager /> */}
+      <PopupManager />
+      <PopupManager />
+      <PopupManager />
+
+      <MandatoryEntertainment />
+      <BackgroundCrying />
       <Box
         sx={{
           display: "flex",
