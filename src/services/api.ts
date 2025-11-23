@@ -1,5 +1,13 @@
 const BASE_URL = "http://10.30.64.227:8080/api";
 
+const customFetch = async (url: string, options: RequestInit = {}) => {
+  const response = await fetch(url, options);
+  if (response.status === 403) {
+    window.dispatchEvent(new CustomEvent("http-403"));
+  }
+  return response;
+};
+
 export interface ApiEvent {
   id: number;
   title: string;
@@ -72,7 +80,7 @@ export interface TierResponse {
 }
 
 export const fetchEvents = async (): Promise<ApiEvent[]> => {
-  const response = await fetch(`${BASE_URL}/events`);
+  const response = await customFetch(`${BASE_URL}/events`);
   if (!response.ok) {
     throw new Error("Failed to fetch events");
   }
@@ -80,7 +88,7 @@ export const fetchEvents = async (): Promise<ApiEvent[]> => {
 };
 
 export const fetchBets = async (): Promise<ApiBet[]> => {
-  const response = await fetch(`${BASE_URL}/bets`);
+  const response = await customFetch(`${BASE_URL}/bets`);
   if (!response.ok) {
     throw new Error("Failed to fetch bets");
   }
@@ -88,7 +96,7 @@ export const fetchBets = async (): Promise<ApiBet[]> => {
 };
 
 export const fetchLeaderboard = async (): Promise<ApiLeaderboardEntry[]> => {
-  const response = await fetch(`${BASE_URL}/leaderboard`);
+  const response = await customFetch(`${BASE_URL}/leaderboard`);
   if (!response.ok) {
     throw new Error("Failed to fetch leaderboard");
   }
@@ -98,7 +106,7 @@ export const fetchLeaderboard = async (): Promise<ApiLeaderboardEntry[]> => {
 export const loginUser = async (
   credentials: LoginRequest
 ): Promise<LoginResponse> => {
-  const response = await fetch(`${BASE_URL}/login`, {
+  const response = await customFetch(`${BASE_URL}/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -115,7 +123,7 @@ export const reportCitizen = async (
   reporterId: number,
   data: ReportRequest
 ): Promise<ReportResponse> => {
-  const response = await fetch(`${BASE_URL}/report`, {
+  const response = await customFetch(`${BASE_URL}/report`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -130,7 +138,7 @@ export const reportCitizen = async (
 };
 
 export const fetchUserLogs = async (userId: number): Promise<LogEntry[]> => {
-  const response = await fetch(`${BASE_URL}/logs/user/${userId}`);
+  const response = await customFetch(`${BASE_URL}/logs/user/${userId}`);
   if (!response.ok) {
     throw new Error("Failed to fetch user logs");
   }
@@ -140,7 +148,7 @@ export const fetchUserLogs = async (userId: number): Promise<LogEntry[]> => {
 export const fetchTierByUsername = async (
   username: string
 ): Promise<TierResponse> => {
-  const response = await fetch(
+  const response = await customFetch(
     `${BASE_URL}/tier?username=${encodeURIComponent(username)}`
   );
 
@@ -151,7 +159,7 @@ export const fetchTierByUsername = async (
 };
 
 export const setDebugScore = async (citizenId: number, score: number) => {
-  const response = await fetch(`${BASE_URL}/bets/debug/set-score`, {
+  const response = await customFetch(`${BASE_URL}/bets/debug/set-score`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

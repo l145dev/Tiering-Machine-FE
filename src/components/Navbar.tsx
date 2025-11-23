@@ -48,6 +48,15 @@ const Navbar = () => {
             >
               Report Citizen
             </Button>
+            <Button
+              variant="outlined"
+              color="warning"
+              size="small"
+              onClick={() => window.dispatchEvent(new CustomEvent("http-403"))}
+              sx={{ ml: 2 }}
+            >
+              Test 403
+            </Button>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
