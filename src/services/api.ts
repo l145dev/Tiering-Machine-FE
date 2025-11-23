@@ -149,17 +149,17 @@ export const fetchTierByUsername = async (
   }
   return response.json();
 };
-
 export const setDebugScore = async (citizenId: number, score: number) => {
-  const response = await fetch(`${BASE_URL}/bets/debug/set-score`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ citizenId, score }),
-  });
+  const response = await fetch(
+    `${BASE_URL}/bets/debug/set-score?citizenId=${citizenId}&score=${score}`,
+    {
+      method: "POST",
+    }
+  );
   if (!response.ok) {
     throw new Error("Failed to set debug score");
   }
-  return response.json();
+  // Return empty object if response has no content
+  const text = await response.text();
+  return text ? JSON.parse(text) : {};
 };

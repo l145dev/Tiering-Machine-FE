@@ -21,9 +21,15 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     msg: string,
     sev: "success" | "error" | "info" | "warning" = "info"
   ) => {
-    setMessage(msg);
-    setSeverity(sev);
-    setOpen(true);
+    // Close any existing toast first to ensure state updates properly
+    setOpen(false);
+
+    // Use setTimeout to ensure the close completes before opening with new values
+    setTimeout(() => {
+      setMessage(msg);
+      setSeverity(sev);
+      setOpen(true);
+    }, 0);
   };
 
   const handleClose = () => {

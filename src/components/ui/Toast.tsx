@@ -7,16 +7,16 @@ interface ToastProps {
   onClose: () => void;
 }
 
-const Toast = ({ open, message, severity = "info", onClose }: ToastProps) => {
+const Toast = ({ open, message, severity = "error", onClose }: ToastProps) => {
   const theme = useTheme();
   const isElite = theme.palette.mode === "light";
 
   return (
     <Snackbar
       open={open}
-      autoHideDuration={6000}
+      autoHideDuration={3000}
       onClose={onClose}
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
     >
       <Alert
         onClose={onClose}
