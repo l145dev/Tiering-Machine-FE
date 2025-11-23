@@ -5,6 +5,7 @@ import { useUser } from "../context/UserContext";
 import { fetchTierByUsername } from "../services/api";
 import { defaultTheme, eliteTheme } from "../theme";
 import Ads from "./Ads";
+import CaptchaDialog from "./CaptchaDialog"; // Import the new component
 
 const Login = () => {
   const { login } = useUser();
@@ -13,6 +14,10 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [tier, setTier] = useState<"dreg" | "citizen" | "elite" | null>(null);
+
+  // Captcha State
+  const [captchaOpen, setCaptchaOpen] = useState(false);
+  const [requiredCaptchas, setRequiredCaptchas] = useState(0);
 
   // Debounce tier checking by 500ms
   useEffect(() => {
@@ -34,19 +39,38 @@ const Login = () => {
     return () => clearTimeout(timeoutId);
   }, [identity]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePreSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Determine verification difficulty based on tier
+    if (tier === "elite") {
+      // No verification for elite
+      await performLogin();
+    } else if (tier === "citizen") {
+      // 1 Captcha for citizens
+      setRequiredCaptchas(1);
+      setCaptchaOpen(true);
+    } else {
+      // 3 Captchas for dregs (or unknown users assuming worst case)
+      setRequiredCaptchas(3);
+      setCaptchaOpen(true);
+    }
+  };
+
+  const performLogin = async () => {
+    setCaptchaOpen(false);
     setLoading(true);
 
     try {
       const success = await login(identity, password);
       if (!success) {
         setError("Authentication failed");
+        setLoading(false);
       }
+      // If success, the App component will re-render and show the main UI
     } catch (err) {
       setError("An error occurred");
-    } finally {
       setLoading(false);
     }
   };
@@ -118,7 +142,7 @@ const Login = () => {
               Access Terminal
             </Typography>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handlePreSubmit}>
               <TextField
                 fullWidth
                 label="Identity"
@@ -214,6 +238,13 @@ const Login = () => {
             <Ads />
           </Box>
         )}
+
+        <CaptchaDialog
+          open={captchaOpen}
+          requiredCount={requiredCaptchas}
+          onComplete={performLogin}
+          onCancel={() => setCaptchaOpen(false)}
+        />
       </Box>
     </ThemeProvider>
   );
