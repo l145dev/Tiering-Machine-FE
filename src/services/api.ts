@@ -158,7 +158,7 @@ export const fetchTierByUsername = async (
   return response.json();
 };
 export const setDebugScore = async (citizenId: number, score: number) => {
-  const response = await fetch(
+  const response = await customFetch(
     `${BASE_URL}/bets/debug/set-score?citizenId=${citizenId}&score=${score}`,
     {
       method: "POST",
