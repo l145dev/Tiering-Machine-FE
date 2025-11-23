@@ -1,4 +1,4 @@
-import { createContext, type ReactNode, useContext, useState } from "react";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import Toast from "../components/ui/Toast";
 
 interface ToastContextType {
@@ -35,6 +35,15 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
   const handleClose = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+    const handle403 = () => {
+      showToast("Access Denied: You do not have permission to perform this action.", "error");
+    };
+
+    window.addEventListener("http-403", handle403);
+    return () => window.removeEventListener("http-403", handle403);
+  }, []);
 
   return (
     <ToastContext.Provider value={{ showToast }}>

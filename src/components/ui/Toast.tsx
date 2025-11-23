@@ -26,20 +26,20 @@ const Toast = ({ open, message, severity = "error", onClose }: ToastProps) => {
           borderRadius: 0,
           ...(isElite
             ? {
-                bgcolor: "background.paper",
+              bgcolor: "background.paper",
+              color: "primary.main",
+              border: "1px solid",
+              borderColor: "primary.main",
+              "& .MuiAlert-icon": {
                 color: "primary.main",
-                border: "1px solid",
-                borderColor: "primary.main",
-                "& .MuiAlert-icon": {
-                  color: "primary.main",
-                },
-              }
+              },
+            }
             : {
-                bgcolor: "background.paper",
-                color: "text.primary",
-                border: "1px solid",
-                borderColor: "divider",
-              }),
+              bgcolor: "background.paper",
+              color: "text.primary",
+              border: "1px solid",
+              borderColor: "divider",
+            }),
         }}
       >
         {message}
