@@ -157,9 +157,9 @@ export const fetchTierByUsername = async (
   }
   return response.json();
 };
-export const setDebugScore = async (citizenId: number, score: number) => {
+export const updateScore = async (citizenId: number, score: number) => {
   const response = await customFetch(
-    `${BASE_URL}/bets/debug/set-score?citizenId=${citizenId}&score=${score}`,
+    `${BASE_URL}/bets/update-score?citizenId=${citizenId}&score=${score}`,
     {
       method: "POST",
     }

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "../context/ToastContext";
 import { useUser } from "../context/UserContext";
-import { setDebugScore } from "../services/api";
+import { updateScore } from "../services/api";
 
 const useDevToolsDetection = () => {
-  const { user } = useUser();
+  const { user, updateUser } = useUser();
   const { showToast } = useToast();
   const [isDevToolsOpen, setIsDevToolsOpen] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -51,7 +51,13 @@ const useDevToolsDetection = () => {
       timeoutRef.current = setTimeout(async () => {
         try {
           console.log("DevTools detected. Penalizing user...");
-          await setDebugScore(user.id, -100);
+          await updateScore(user.id, -100);
+
+          // Update local user context immediately
+          if (user) {
+            updateUser({ ...user, total_points: user.total_points - 100 });
+          }
+
           showToast("You lost 100 points smh", "error");
           hasPenalizedRef.current = true; // Ensure we only penalize once per session/load
         } catch (error) {
@@ -65,7 +71,7 @@ const useDevToolsDetection = () => {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [isDevToolsOpen, user, showToast]);
+  }, [isDevToolsOpen, user, showToast, updateUser]);
 
   return isDevToolsOpen;
 };
