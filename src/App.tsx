@@ -1,17 +1,17 @@
 import { Box, CssBaseline } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { useEffect } from "react";
+import BackgroundCrying from "./components/BackgroundFah";
 import Left from "./components/layout/Left";
 import Middle from "./components/layout/Middle";
 import Right from "./components/layout/Right";
 import Login from "./components/Login";
+import MandatoryEntertainment from "./components/MandatoryEntertainment"; // Import here
 import Navbar from "./components/Navbar";
 import PopupManager from "./components/PopupManager";
-import MandatoryEntertainment from "./components/MandatoryEntertainment"; // Import here
 import { useUser } from "./context/UserContext";
 import useDevToolsDetection from "./hooks/useDevToolsDetection";
 import { defaultTheme, eliteTheme } from "./theme";
-import BackgroundCrying from "./components/BackgroundCrying";
 
 function App() {
   const { isAuthenticated, user } = useUser();

@@ -6,15 +6,15 @@ const FAH_PATH = new URL("../assets/fah.mp3", import.meta.url).href;
 const BackgroundCrying = () => {
   // Use useMemo to initialize the Audio object once
   const audio = useMemo(() => {
-    const cry = new Audio(FAH_PATH);
-    cry.volume = 1;
-    return cry;
+    const fah = new Audio(FAH_PATH);
+    fah.volume = 1;
+    return fah;
   }, []);
 
   useEffect(() => {
     let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    const startPeriodicCrying = () => {
+    const startPeriodicFah = () => {
       if (intervalId) {
         clearInterval(intervalId);
       }
@@ -22,7 +22,7 @@ const BackgroundCrying = () => {
       // Choose a random interval between 30 and 60 seconds (30000ms and 60000ms)
       const randomInterval = Math.floor(Math.random() * 10000) + 30000;
 
-      const playCry = () => {
+      const playFah = () => {
         // Reset time to ensure instant playback from the beginning
         audio.currentTime = 0;
         audio
@@ -41,11 +41,11 @@ const BackgroundCrying = () => {
       };
 
       // Set the interval to start the crying periodically
-      intervalId = setInterval(playCry, randomInterval);
+      intervalId = setInterval(playFah, randomInterval);
     };
 
-    // Start the periodic crying cycle
-    startPeriodicCrying();
+    // Start the periodic fah cycle
+    startPeriodicFah();
 
     // Cleanup function: pause audio and clear interval when the component unmounts
     return () => {
